@@ -220,7 +220,7 @@ Yes, there are still some reasons to use React class components, although functi
 
 Here are a few reasons why you might still choose to use React class components:
 
-- Legacy Codebase: If you are working on a legacy codebase that uses class components, it might be more efficient to continue using class components rather than rewriting all of your code.
+- [#F5FFC9]Legacy Codebase: If you are working on a legacy codebase that uses class components, it might be more efficient to continue using class components rather than rewriting all of your code.
 
 - Lifecycle Methods: React class components have access to a number of lifecycle methods that are not available to function components. If you need to use one of these lifecycle methods, such as componentDidMount or componentDidUpdate, you will need to use a class component.
 
