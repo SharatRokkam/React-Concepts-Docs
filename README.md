@@ -40,6 +40,13 @@ const element = <div>Hello, world!</div>;
 ```
 #### Points to Remember
 - You can only return one top level element from given component. This is usually known as parent element.
-- Elements including self closing tags are needed to be closed like <hr />
+- Elements including self closing tags are needed to be closed.
 - Unlike HTML, class attribute should be written as ClassName.
 - React Component should be 'Capitalized' as it will be treated as identifier instead of string.
+
+## Virtual DOM
+
+- DOM stands for Document object model. It is structured representation of HTML elements that are present in the webpage. It contains node for each UI element present in the web document.
+- Virtual DOM in react is a lightweight copy of actual DOM. It is same as DOM but it does not have the power to directly change the layout of the document. React maintains two VDOM at each time, one contains the updated VDOM and one is just the pre-updated version of this VDOM.
+- React Compares both the VDOM to figure out the exact changes in the DOM, process of comparison is known as 'Diffing Algorithm'. Once React finds out what exactly has changed then it updates those objects only, on real DOM. React uses something called batch updates to update the real DOM.
+- It just means that the change to the real DOM are sent in the batches instead of sending any update for single change in the state of component. React manages re-rendering of UI most efficiently by ensuring that the Real DOM receives batch update to re-render the UI. This entire process of transforming changes to real DOM is called as 'RECONCILIATION'.
