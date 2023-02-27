@@ -93,3 +93,33 @@ function Example() {
 This is an example of one-way data binding, as the value of count flows from the state variable to the UI element (the paragraph element), but changes made to the UI element do not affect the state variable.
 
 If we were using two-way data binding, we would need to define an event handler for the paragraph element to update the state variable when the user changes the text. However, in one-way data binding, the paragraph element is only used to display the current value of the 'count' variable, and does not update the variable when clicked or changed.
+
+## Component Based
+- Component-based architecture: React allows developers to build complex UIs by breaking them down into small, reusable components. Each component is responsible for rendering a small part of the UI, and can be composed together to create larger, more complex UIs.
+- There are two types of components in React
+1. Class based components
+2. Functional based components
+
+## Import and Exports
+
+Importing and exporting in React JS will help us write modular code, i.e., splitting code into multiple files. Importing allows using contents from another file, whereas exporting makes the file contents eligible for importing. The basic idea behind imports and exports is to exchange contents between several JavaScript files.
+
+```
+const person = {
+    name:'Kedar'
+}
+
+export default person;
+```
+```
+export const age = 23;
+export const birth_country = "India"
+```
+- A File can have no more than one default export but it can have as many named exports as you like.
+
+```
+import person from './name.js'
+import {age} from './info.js'
+import {birth_country} from  info.js'
+```
+When you write default import you can put 'any name' you want after import. Incase of named imports, the name has to match on both sides. That's why they are called named exports/imports. We can export multiple components form same file using one default export and numerous named exports if required.
