@@ -227,3 +227,7 @@ Here are a few reasons why you might still choose to use React class components:
 - More Explicit: Some developers prefer the more explicit nature of class components. With class components, everything is defined in one place, making it easier to see what's going on in your code.
 
 That being said, function components are generally considered the better choice for new React projects, as they offer better performance, simpler syntax, and easier testing. However, there are still some cases where class components might be the better option.
+
+## Functional vs Class Component
+
+|        |Class Component | Functional Component |
