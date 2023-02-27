@@ -38,7 +38,7 @@ In JSX, the same code can be written as:
 ```
 const element = <div>Hello, world!</div>;
 ```
-####Points to Remember
+#### Points to Remember
 - You can only return one top level element from given component. This is usually known as parent element.
 - Elements including self closing tags are needed to be closed like <hr />
 - Unlike HTML, class attribute should be written as ClassName.
