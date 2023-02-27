@@ -24,7 +24,7 @@
 
 # Features
 
-## 1.JSX
+## 1. JSX
 
 JSX is a syntax extension for JavaScript that allows developers to write HTML-like code within their JavaScript code. It was developed by Facebook as part of the React library and is used extensively in React applications.
 
@@ -38,3 +38,8 @@ In JSX, the same code can be written as:
 ```
 const element = <div>Hello, world!</div>;
 ```
+####Points to Remember
+- You can only return one top level element from given component. This is usually known as parent element.
+- Elements including self closing tags are needed to be closed like <hr />
+- Unlike HTML, class attribute should be written as ClassName.
+- React Component should be 'Capitalized' as it will be treated as identifier instead of string.
