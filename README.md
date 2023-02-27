@@ -115,7 +115,7 @@ export default person;
 export const age = 23;
 export const birth_country = "India"
 ```
-- A File can have no more than one default export but it can have as many named exports as you like.
+A File can have no more than one default export but it can have as many named exports as you like.
 
 ```
 import person from './name.js'
@@ -123,3 +123,107 @@ import {age} from './info.js'
 import {birth_country} from  info.js'
 ```
 When you write default import you can put 'any name' you want after import. Incase of named imports, the name has to match on both sides. That's why they are called named exports/imports. We can export multiple components form same file using one default export and numerous named exports if required.
+
+# Components
+
+## Class Component
+
+In React, class-based components are a type of component that is defined using a JavaScript class. They are an older method of defining components, and have largely been replaced by functional components in modern React development. However, they are still commonly used in legacy code and in some specialized cases.
+
+Class-based components are defined using the class keyword, and they extend the React.Component class. They define a render() method that returns a React element, which describes the UI that should be rendered to the screen.
+
+Here is an example of a class-based component:
+
+```
+import React from 'react';
+
+class ExampleComponent extends React.Component {
+  render() {
+    return (
+      <div>
+        <h1>Hello, world!</h1>
+      </div>
+    );
+  }
+}
+```
+
+In this example, we define a class-based component called ExampleComponent. It extends the React.Component class and defines a render() method that returns a div element containing an h1 element.
+
+Class-based components have a few advantages over functional components, such as the ability to define state and lifecycle methods. However, they also have some disadvantages, such as being more verbose and harder to understand for beginners.
+
+In general, functional components are preferred for modern React development, as they are easier to write and maintain, and provide better performance. However, class-based components are still a valuable tool in the React developer's toolbox, and can be useful in some specialized cases.
+
+### What is Constructor and Super Keyword?
+
+Constructor are used for 2 purposes :
+In React class components to initialize the component's state and to bind event handlers.
+
+super() is used to call the constructor of its parent class. If we would like to set a property or access this inside the constructor we need to call super() method.
+
+```
+import React from 'react';
+
+class ExampleComponent extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: 'John',
+      age: 30
+    };
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>My name is {this.state.name} and I am {this.state.age} years old.</h1>
+      </div>
+    );
+  }
+}
+```
+
+In this example, we define a class-based component called ExampleComponent. We define a constructor method that calls the super method to initialize the component's props and sets the component's initial state to an object with two properties, name and age. We then use the name and age state properties in the render method to display a message on the screen.
+
+This is a very basic example, but it demonstrates how the constructor and super keywords are used to initialize a React class component's state.
+
+## Functional component
+
+In React, function-based components are a newer and more lightweight way to define components than class-based components. They are defined using JavaScript functions and can be considered as pure functions that take in props and return a React element.
+
+Here is an example of a function-based component:
+```
+import React from 'react';
+
+function ExampleComponent(props) {
+  return (
+    <div>
+      <h1>Hello, {props.name}!</h1>
+    </div>
+  );
+}
+```
+
+In this example, we define a function-based component called `ExampleComponent`. It takes in a `props` parameter, which is an object containing any props that are passed to the component. It returns a `div` element containing an `h1` element that displays the `name` prop.
+
+Function-based components have several advantages over class-based components:
+
+- They are simpler and more lightweight than class-based components, which makes them easier to read, write, and maintain.
+- They are less verbose than class-based components, which means less boilerplate code.
+- They are easier to test because they are just plain functions that take in props and return a React element.
+- They are faster than class-based components, because they don't have the overhead of a class instance and lifecycle methods.
+
+In summary, function-based components are a simpler and more lightweight way to define components in React. They are easier to read, write, and maintain, and provide better performance than class-based components. For these reasons, they have become the preferred way to define components in modern React development.
+
+### Is there any reason to still use react class components?
+Yes, there are still some reasons to use React class components, although function components are now the preferred way of writing components in React.
+
+Here are a few reasons why you might still choose to use React class components:
+
+- Legacy Codebase: If you are working on a legacy codebase that uses class components, it might be more efficient to continue using class components rather than rewriting all of your code.
+
+- Lifecycle Methods: React class components have access to a number of lifecycle methods that are not available to function components. If you need to use one of these lifecycle methods, such as componentDidMount or componentDidUpdate, you will need to use a class component.
+
+- More Explicit: Some developers prefer the more explicit nature of class components. With class components, everything is defined in one place, making it easier to see what's going on in your code.
+
+That being said, function components are generally considered the better choice for new React projects, as they offer better performance, simpler syntax, and easier testing. However, there are still some cases where class components might be the better option.
