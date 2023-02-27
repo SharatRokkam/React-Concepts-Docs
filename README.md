@@ -230,4 +230,7 @@ That being said, function components are generally considered the better choice 
 
 ## Functional vs Class Component
 
-|        |Class Component | Functional Component |
+|hgfuyg|ghvjh|jhgh|
+|:-----|:----|:---|
+|Class | Class | Class |
+
