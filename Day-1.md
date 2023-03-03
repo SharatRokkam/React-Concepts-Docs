@@ -281,17 +281,15 @@ we can export each style object individually, which will also mean importing the
 
 
 
-CONDITIONAL RENDERING :
+## CONDITIONAL RENDERING :
 
-In React conditional rendering means to render something if the given condition is true, to follow this concept we can always use traditional if-else statements but in addition to that React allows 
-Ternary operators and Logical && operator to put something in condition.
-
+# In React conditional rendering means to render something if the given condition is true, to follow this concept we can always use traditional if-else statements but in addition to that React allows Ternary operators and Logical && operator to put something in condition.
 
 
 You can return a JSX expression conditionally with an if statement.
-You can conditionally save some JSX to a variable and then include it inside other JSX by using the curly braces.
-In JSX,  {cond ? <A /> : <B />} means if “cond is true, render A else B ”.
-In JSX, {cond && <A />} means if “cond is true, render A otherwise nothing.
+- You can conditionally save some JSX to a variable and then include it inside other JSX by using the curly braces.
+- In JSX,  {cond ? <A /> : <B />} means if “cond is true, render A else B ”.
+- In JSX, {cond && <A />} means if “cond is true, render A otherwise nothing.
 
 ```
 class App extends Component {
