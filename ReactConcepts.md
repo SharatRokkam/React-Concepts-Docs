@@ -451,64 +451,67 @@ The componentWillUnmount lifecycle method is invoked immediately before a compon
 # Hooks
 
 ### What is Props-Drilling?
-```
-Prop drilling is basically a situation when the same data is being sent at almost every level due to requirements in the final level.
-Passing data through multiple components is not a good way of writing clean, reusable, and DRY code.
-```
-#### Example:
 
-<img src="https://lh5.googleusercontent.com/K1veBT9r_aQPq_iYI9MdtljbsBu8egv7n8cu78fWqzL0POVn2xb66r_gEFgJ8qg9FxphsGFqNZIDQ3QZ0zuT-XtEcrpNVZylXvxhDTPAySL8_FJWiIGHlcXggcHYCFKaQeNp8HRQvCZZQHRULaf8_vtg8mgyZElVhkSiUYgicFQ0mo6zPgGve9-Pcg" width="500" height ="500"/>
+- Prop drilling in React refers to the process of passing props (short for properties) from a component to its child components, and then to their child components, and so on, even if those intermediate components don't actually use the prop themselves. This can result in unnecessary code complexity and make it harder to reason about the data flow in the application.
+
+- For example, consider a scenario where a parent component needs to pass a prop to a deeply nested child component. If the intermediate components don't use the prop, but are required to pass it down to their own children, this can create a lot of unnecessary code and make the component tree more difficult to understand.
+
+- To avoid prop drilling, React provides a few different solutions, such as using React context or Redux for managing application state. By using these tools, data can be made available to any component in the application without the need for explicit prop passing. This can help reduce the amount of code required and make the application more maintainable.
+
 
 ### Props-Drilling Code
 ```
-import React, { useState } from "react";
+import React from 'react';
 
-function Parent() {
-const [fName, setfName] = useState("firstName");
-const [lName, setlName] = useState("LastName");
-return (
-	<>
-	<div>This is a Parent component</div>
-	<br />
-	<ChildA fName={fName} lName={lName} />
-	</>
-);
+function App() {
+  const user = { name: 'John', age: 30, email: 'john@example.com' };
+
+  return (
+    <div>
+      <Header user={user} />
+      <Main user={user} />
+      <Footer user={user} />
+    </div>
+  );
 }
 
-function ChildA({ fName, lName }) {
-return (
-	<>
-	This is ChildA Component.
-	<br />
-	<ChildB fName={fName} lName={lName} />
-	</>
-);
+function Header({ user }) {
+  return (
+    <header>
+      <h1>Welcome, {user.name}!</h1>
+      <p>Age: {user.age}</p>
+    </header>
+  );
 }
 
-function ChildB({ fName, lName }) {
-return (
-	<>
-	This is ChildB Component.
-	<br />
-	<ChildC fName={fName} lName={lName} />
-	</>
-);
+function Main({ user }) {
+  return (
+    <main>
+      <h2>User Info:</h2>
+      <UserInfo user={user} />
+    </main>
+  );
 }
 
-function ChildC({ fName, lName }) {
-return (
-	<>
-	This is ChildC component.
-	<br />
-	<h3> Data from Parent component is as follows:</h3>
-	<h4>{fName}</h4>
-	<h4>{lName}</h4>
-	</>
-);
+function UserInfo({ user }) {
+  return (
+    <div>
+      <p>Name: {user.name}</p>
+      <p>Age: {user.age}</p>
+      <p>Email: {user.email}</p>
+    </div>
+  );
 }
 
-export default Parent;
+function Footer({ user }) {
+  return (
+    <footer>
+      <p>Contact: {user.email}</p>
+    </footer>
+  );
+}
 
+export default App
 ```
 
 ## Solution of Props-Drilling:
@@ -517,101 +520,59 @@ The React context API is a fast way of avoiding prop drilling and ensuring your 
 ```
 
 ### What is Context API??
-```
-React context is a built-in API that uses the useContext hook to share data across components.
-Imagine passing the data of an authenticated user from a parent component to a deep nested child component. This will be cumbersome if you need to pass the data through a lot of intermediate components.
 
-A better approach to doing this is using React context to handle the data.  
-```
+- Context API enables you to share data between components that are not directly connected in the component tree, without having to pass data down as props through every level of the tree.
 
-### How to Use the React Context API??
-```
-useContext is a built-in hook in React. You can start using the context API by importing the **createContext** function from React.
-```
-
-#### Step-1: createContext
-#### we initialized our context and named it globalContext.
-```
-Import {createContext} from ‘react’;
-
-const globalContext = createContext();
-```
-
-#### Step-2: provide the context
-#### The context API uses a provider to pass data to its child components. You will have to wrap all components with a provider component.
-```
-<globalContext.Provider value={...}> // Like BrowserRouter
-	<ParentComponent/>
-<globalContext.Provider>
-```
-
-#### Example:
-```
-import React from ‘react’;
-
-function App() {
-
-	const username = “John Doe”
-    
-	return(
-        <globalContext.Provider value={username}> 
-        	<Dashboard/>
-        <globalContext.Provider>
-    )
-}
-
-export default App;
-```
-
-## There are two ways to consume the context.
-` Way-1 `
-
-#### Step-3: Consume the context 
-```
-We can consume the context by using the useContext hook.
-Without passing data through nested components, you can access your context in any component you want. 
-```
+- Here's an example of how you can use the Context API to pass a theme to child components:
 
 ```
-import { useContext } from ‘react’;
+// Create a new context for the theme
+import React, { createContext, useState } from 'react';
 
-const Profile = () => {
+export const ThemeContext = createContext();
 
-	const value = useContext(globalContext);  //Consume the context way-1
-    
-	return (
-        <div>
-        	{value}                         // used state directly where we want
-        </div>
-    )
-}
+// Create a provider component that will pass the theme to its children
+export const ThemeProvider = (props) => {
+  const [theme, setTheme] = useState('light');
 
-export default Profile
-```
-` Way-2 `
-```
-import { globalContext } from './context';  // Import your globalContext.
-
-function ChildComponent() {
   return (
-    <globalContext.Consumer>
-      {value => <span>{value}</span>}
-    </globalContext.Consumer>
+    <ThemeContext.Provider value={[theme, setTheme]}>
+      {props.children}
+    </ThemeContext.Provider>
+  );
+}
+
+```
+In this example, we define a new context using the createContext method and create a provider component ThemeProvider that wraps its children with the ThemeContext.Provider. The provider component sets the initial state of the theme to "light" and passes the theme and setTheme functions down to its children as a value using the value prop.
+
+To consume the context value in child components, you can use the useContext hook:
+```
+import React, { useContext } from 'react';
+import { ThemeContext } from './ThemeContext';
+
+function Header() {
+  const [theme, setTheme] = useContext(ThemeContext);
+
+  return (
+    <header style={{ backgroundColor: theme === 'light' ? '#eee' : '#222' }}>
+      <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
+        {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+      </button>
+    </header>
   );
 }
 ```
 
-#### Example of useContext
- <img src="https://dmitripavlutin.com/90649ae4bdf379c482ad24e0dd220bc4/react-context-3.svg" />
+In this example, we import the ThemeContext and use the useContext hook to get access to the theme and setTheme functions. We use the theme value to set the background color of the header and toggle between light and dark mode when the button is clicked.
+
+This is just a basic example, but the Context API can be used for more complex data sharing scenarios, like passing user authentication information or language preferences down the component tree.
  
  
 # useState:
-```
-The useState() is a Hook that allows you to have state variables in functional components.
-It returns an array with two values: **the current state** and a **function to update** it. 
-The Hook takes an initial state value as an argument and returns an updated state value whenever the setter function is called.
-useState is a named export from react. To use it, you can write React.useState or import it by writing useState:
-```
+
+- useState is a hook in React that allows functional components to have state. In class components, state is defined using a class property called state. However, with functional components, stateful logic had to be implemented using class components, making the code more verbose and harder to read.
+
+useState hook provides a way to manage state in functional components by allowing you to declare a state variable and a function to update that variable.
 
 ### Syntax:
 ` const [state, setState] = useState(initialValue); `
@@ -621,73 +582,53 @@ the **initialValue** is the value you want to start with, and **state** is the c
 The **setState function** can be used to update the state, triggering a re-render of your component.
 ```
 
-### Updating objects:
 ```
-const [state, setState] = useState({ name: 'John', age: 30 });
+import React, { useState } from 'react';
 
-const updateName = () => {
-  setState({ ...state, name: 'Jane' });
-};
+function Form() {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: ''
+  });
 
-const updateAge = () => {
-  setState({ ...state, age: state.age + 1 });
-};
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value
+    }));
+  };
 
-```
-
-### Updating Array:
-```
-const [array, setArray] = useState([1, 2, 3, 4, 5]);
-
-const addItem = () => {
-  setArray([...array, 6]);
-};
-
-const removeItem = () => {
-  setArray(array.slice(0, array.length - 1));
-};
-```
-
-## Code with Array:
-```
-const MessageList = () => {
-  const [message, setMessage] = useState("");
-  const [messageList, setMessageList] = useState([]);
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log(formData);
+  };
 
   return (
-    <div>
-      <input
-        type="text"
-        value={message}
-        placeholder="Enter a message"
-        onChange={e => {
-          setMessage(e.target.value);
-        }}
-      />
-      <input
-        type="button"
-        value="Add"
-        onClick={e => {
-          setMessageList([
-            ...messageList,
-            {
-              // Use the current size as ID (needed to iterate the list later)
-              id: messageList.length + 1,
-              message: message
-            }
-          ]);
-          setMessage(""); // Clear the text box
-        }}
-      />
-      <ul>
-        {messageList.map(m => (
-          <li key={m.id}>{m.message}</li>
-        ))}
-      </ul>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <label htmlFor="firstName">First Name:</label>
+      <input type="text" name="firstName" value={formData.firstName} onChange={handleInputChange} />
+
+      <label htmlFor="lastName">Last Name:</label>
+      <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange} />
+
+      <label htmlFor="email">Email:</label>
+      <input type="email" name="email" value={formData.email} onChange={handleInputChange} />
+
+      <label htmlFor="password">Password:</label>
+      <input type="password" name="password" value={formData.password} onChange={handleInputChange} />
+
+      <button type="submit">Submit</button>
+    </form>
   );
-};
+}
+
 ```
+
+- In this example, we use the useState hook to define a state variable formData that is an object containing the values of the form fields. We define an handleInputChange function that is called when any of the form fields are updated. This function uses the setFormData function to update the formData state with the new value of the input field.
+- 
 
 # useEffect:
 ```
@@ -748,60 +689,132 @@ function User({ name }) {
 ![Screenshot 2023-02-28 145946](https://user-images.githubusercontent.com/94469107/221811103-7e163ef9-8791-4eba-a6c3-a6518c7686dd.png)
 
 # useMemo:
-```
-The useMemo is a hook used in the functional component of react that returns a memoized value.
 
-**Memoized value**
-- In Computer Science, memoization is a concept used in general when we don’t need to recompute the function with a 
-  given argument for the next time as it returns the cached result. 
- - A memoized function remembers the results of output for a given set of inputs.
+-`useMemo` is a hook provided by React that allows you to memoize the result of a function call so that the function doesn't get called unnecessarily. Memoization is a technique where the result of a function is cached so that if the same function is called again with the same arguments, the cached result can be returned instead of recomputing it.
 
-**Situation:**
-- if there is a function to add two numbers, and we give the parameter as 1 and 2 for the first time the function will add these two numbers and return 3, 
-- but if the same inputs come again then we will return the cached value i.e 3 and not compute with the add function again. 
+Here's an example of how you can use useMemo in practice:
 
 ```
+import React, { useMemo, useState } from 'react';
 
-#### Syntax:
+function App() {
+  const [count, setCount] = useState(0);
+
+  // This function will get called every time the component re-renders
+  function expensiveFunction() {
+    console.log('expensiveFunction called');
+    let result = 0;
+    for (let i = 0; i < 1000000000; i++) {
+      result += i;
+    }
+    return result;
+  }
+
+  // Use useMemo to memoize the result of the expensiveFunction
+  const memoizedResult = useMemo(() => expensiveFunction(), []);
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <p>Memoized result: {memoizedResult}</p>
+      <button onClick={() => setCount(count + 1)}>Increment count</button>
+    </div>
+  );
+}
+
 ```
-const memoizedValue = useMemo(functionThatReturnsValue, arrayDepencies)
-```
+- In this example, we have an expensive function expensiveFunction that takes a long time to run (simulated here by a loop that adds up numbers). We then use useMemo to memoize the result of the function by passing it the function as the first argument and an empty array as the second argument (which means that the memoized value will only be computed once when the component mounts). The memoized value is then stored in memoizedResult and can be used in the JSX markup.
 
-#### Code:
+- By using `useMemo`, the expensiveFunction is only called once when the component mounts, and its result is then cached. Subsequent re-renders of the component will use the memoized result instead of re-running the function, resulting in a performance improvement.
 
-![Screenshot 2023-02-28 151250](https://user-images.githubusercontent.com/94469107/221814663-640451e5-b18c-4160-8980-27218731ea05.png)
 
-### WithMemo Output:-
-- Now in the above example, we have used the user memo hook, here the function that returns the value
--  i.e squareNum is passed inside the useMemo and inside the array dependencies, 
--  we have used the number as the squareNum will run only when the number changes. 
--  If we increase the counter and the number remains the same in the input field the squareNum doesn’t run again
+
+
 
 # useReducer:
-```
-The useReducer Hook is the better alternative to the useState hook and is generally more preferred over the useState hook 
-when you have complex state-building logic or when the next state value depends upon its previous value or when the components are needed to be optimized.
-```
+
+- `useReducer` is a built-in hook in React that provides an alternative way of managing `state` in a component. It is similar to `useState` but instead of managing a single piece of state, it allows you to manage more complex state that may have multiple properties or requires more complex updates.
+
+
 ### Syntax:
 ```
 const [state, dispatch] = useReducer(reducer, initialArgs, init);
 
 - The useReducer hook takes three arguments including reducer, initial state, and the function to load the initial state lazily.
 ```
+
 ### Example: 
 
-![Screenshot 2023-02-28 152035](https://user-images.githubusercontent.com/94469107/221816492-dee00e3b-d38d-4b58-8f5b-55450d1d2cf9.png)
+```
+import React, { useReducer, useState } from 'react';
 
-### Output:
-<img src="https://media.geeksforgeeks.org/wp-content/uploads/20201103231033/gfg.gif" />
+const initialState = {
+  todos: [],
+  todoCount: 0
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'addTodo':
+      return {
+        ...state,
+        todos: [...state.todos, { id: state.todoCount + 1, text: action.payload }],
+        todoCount: state.todoCount + 1
+      };
+    case 'removeTodo':
+      return {
+        ...state,
+        todos: state.todos.filter(todo => todo.id !== action.payload)
+      };
+    default:
+      throw new Error();
+  }
+}
+
+function TodoList() {
+  const [inputValue, setInputValue] = useState('');
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (inputValue.trim() === '') return;
+    dispatch({ type: 'addTodo', payload: inputValue });
+    setInputValue('');
+  }
+
+  function handleRemove(id) {
+    dispatch({ type: 'removeTodo', payload: id });
+  }
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
+        <button>Add Todo</button>
+      </form>
+      <ul>
+        {state.todos.map(todo => (
+          <li key={todo.id}>
+            {todo.text} <button onClick={() => handleRemove(todo.id)}>Remove</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+- This implementation shows how useReducer can be used to manage more complex state that involves multiple properties and actions. It also demonstrates how actions can be dispatched to update the state in a predictable and consistent way.
+
 
 # useCallback:
-```
-The useCallback hook is used when you have a component in which the child is rerendering again and again without need.
+
+
+### The useCallback hook is used when you have a component in which the child is rerendering again and again without need.
 - Pass an inline callback and an array of dependencies. 
 - useCallback will return a memoized version of the callback that only changes if one of the dependencies has changed. 
 - This is useful when passing callbacks to optimized child components that rely on reference equality to prevent unnecessary renders.
-```
+
 
 ### Syntax:
 ```
@@ -814,7 +827,50 @@ const memoizedCallback = useCallback(
 ```
 ### Code:
 
-![Screenshot 2023-02-28 153244](https://user-images.githubusercontent.com/94469107/221820749-096aaf65-3778-4ac4-85b0-cef03ed45916.png)
+```
+import React, { useState, useCallback } from 'react'
+var funccount = new Set();
+const App = () => {
+ 
+ 
+  const [count, setCount] = useState(0)
+  const [number, setNumber] = useState(0)
+ 
+const incrementCounter = useCallback(() => {
+  setCount(count + 1)
+}, [count])
+const decrementCounter = useCallback(() => {
+  setCount(count - 1)
+}, [count])
+const incrementNumber = useCallback(() => {
+  setNumber(number + 1)
+}, [number])
+   
+funccount.add(incrementCounter);
+funccount.add(decrementCounter);
+funccount.add(incrementNumber);
+alert(funccount.size);
+ 
+  return (
+    <div>
+      Count: {count}
+      <button onClick={incrementCounter}>
+         Increase counter
+      </button>
+      <button onClick={decrementCounter}>
+         Decrease Counter
+      </button>
+      <button onClick={incrementNumber}>
+         increase number
+      </button>
+    </div>
+  )
+}
+ 
+ 
+export default App;
+
+```
 
 # useRef
 ```
@@ -834,36 +890,37 @@ const refContainer = useRef(initialValue);
 ### Code:
 
 ```
-import React, {Fragment, useRef} from 'react';
+import React, { useRef } from 'react';
 
-function App() {
+function ResizableTextarea() {
+  const textareaRef = useRef(null);
 
-// Creating a ref object using useRef hook
-const focusPoint = useRef(null);
-const onClickHandler = () => {
-	focusPoint.current.value =
-	"The quick brown fox jumps over the lazy dog";
-	focusPoint.current.focus();
-};
-return (
-	<Fragment>
-	<div>
-		<button onClick={onClickHandler}>
-		ACTION
-		</button>
-	</div>
-	<label>
-	Click on the action button to
-	focus and populate the text.
-	</label><br/>
-	<textarea ref={focusPoint} />
-	</Fragment>
-);
-};
+  // Define a function to resize the textarea based on its content
+  const resizeTextarea = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+    }
+  };
 
-export default App;
+  // Call resizeTextarea whenever the textarea content changes
+  const handleTextareaChange = (event) => {
+    resizeTextarea();
+  };
 
+  return (
+    <div>
+      <textarea ref={textareaRef} onChange={handleTextareaChange} />
+    </div>
+  );
+}
 ```
+In this example, we create a textarea element and attach a `ref` to it using the useRef hook. We also define a function `resizeTextarea` using a regular function expression. This function resizes the textarea element based on its content by setting its `height` style property to the `scrollHeight` of the element.
+
+We call `resizeTextarea` whenever the content of the `textarea` changes by attaching an onChange event listener to the element and calling resizeTextarea inside the event handler function handleTextareaChange.
+
+By using the `useRef` hook, we can get a reference to the `textarea` element and manipulate its properties and styles directly, which can be useful for implementing custom behavior that is not available through props or state.
 
 ## Stylig with Material UI
 - Material UI is an open-source React component library that implements Google's Material Design. 
@@ -879,6 +936,7 @@ export default App;
 ## ColorPicker
 
 ![Screenshot 2023-03-01 124819](https://user-images.githubusercontent.com/94469107/222070287-61f0fd15-a016-4906-b53b-9753abe9390a.png)
+
 
 # Form
 
@@ -1208,16 +1266,12 @@ export default function App() {
 
 # React Router
 
-- React Router is a JavaScript framework that lets us handle client and server-side routing in React applications. 
-- It enables the creation of single-page web or mobile apps that allow navigating without refreshing the page.
-- It also allows us to use browser history features while preserving the right application view.
-- Routing is a process in which a user is directed to different pages based on their action or request.
-- ReactJS Router is mainly used for developing Single Page Web Applications. 
-- React Router is used to define multiple routes in the application.
-- When a user types a specific URL into the browser, and if this URL path matches any 'route' inside the router file, the user will be redirected to that particular route.
+- React Router is a popular routing library for React that allows you to navigate between different pages or views in a React application. Here's an example of how to use React Router DOM to create a simple multi-page application:
 
 ## React Router Installation
 `$ npm install react-router-dom --save   `
+
+
 
 ### Adding React Router Components:
 1. **BrowserRouter** : 
@@ -1233,269 +1287,99 @@ export default function App() {
     - Link component is used to create links to different routes and implement navigation around the application. 
     - It works like HTML anchor tag.
 
-## Code
+#### Once you have installed the package, you can create a new component to represent your app's main layout:
+
 
 ```
-import React, { Component } from 'react';
-import { BrowserRouter as Router,Routes, Route, Link } from 'react-router-dom';
-import Home from './component/home';
-import About from './component/about';
-import Contact from './component/contact';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import HomePage from './pages/HomePage';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
 
-class App extends Component {
-render() {
-	return (
-	<Router>
-		<div className="App">
-			<ul className="App-header">
-			<li>
-				<Link to="/">Home</Link>
-			</li>
-			<li>
-				<Link to="/about">About Us</Link>
-			</li>
-			<li>
-				<Link to="/contact">Contact Us</Link>
-			</li>
-			</ul>
-		<Routes>
-				<Route exact path='/' element={< Home />}></Route>
-				<Route exact path='/about' element={< About />}></Route>
-				<Route exact path='/contact' element={< Contact />}></Route>
-		</Routes>
-		</div>
-	</Router>
-);
-}
+function App() {
+  return (
+    <Router>
+      <div>
+        <nav>
+          <ul>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/about">About</Link>
+            </li>
+            <li>
+              <Link to="/contact">Contact</Link>
+            </li>
+          </ul>
+        </nav>
+        <Switch>
+          <Route path="/about">
+            <AboutPage />
+          </Route>
+          <Route path="/contact">
+            <ContactPage />
+          </Route>
+          <Route path="/">
+            <HomePage />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
+  );
 }
 
 export default App;
 ```
+- We wrap our entire app inside the Router component, which provides the routing functionality for our app. Inside the Router, we create a navigation menu using the Link component to navigate between our pages.
 
-## Outlet
-
-```
-An <Outlet> should be used in parent route elements to render their child route elements. 
-This allows nested UI to show up when child routes are rendered. 
-If the parent route matched exactly, it will render a child index route or nothing if there is no index route.
-```
-
-## Code:
-```
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Link,
-  Outlet
-} from 'react-router-dom';
-
-function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="users" element={<Users />}>
-          <Route path="/" element={<UsersIndex />} />
-          <Route path=":id" element={<UserProfile />} />
-          <Route path="me" element={<OwnUserProfile />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  );
-}
-
-function Users() {
-  return (
-    <div>
-      <nav>
-        <Link to="me">My Profile</Link>
-      </nav>
-
-      <Outlet />
-    </div>
-  );
-}
-```
-
-## Lazy Loading :
+- We define our routes using the Route component inside a Switch. Each Route component defines a path and a corresponding component to render when that path is visited. In this example, we have three routes: /about, /contact, and /. The last route, /, is the default route that will be rendered when no other route matches the current path.
 
 ```
-Lazy loading is one of the most common design patterns used in web and mobile development. 
-It is widely used with frameworks like Angular and React to increase an application’s performance by reducing initial loading time.
+Each page component (HomePage, AboutPage, and ContactPage) can be defined as a regular functional component that returns the content for that page:
 ```
 
-```
-In simple terms, lazy loading is a design pattern. 
-It allows you to load parts of your application on-demand to reduce the initial load time. 
-For example, you can initially load the components and modules related to user login and registration. 
-Then, you can load the rest of the components based on user navigation.
-```
-
-```
-You might not feel much difference when using lazy loading for small-scale applications. 
-But it significantly impacts large-scale applications by reducing the initial load time. 
-Ultimately, it improves both the user experience and the application’s performance.
-```
-
-#### Advantages of Lazy Loading
-- Reduces initial loading time by reducing the bundle size.
-- Reduces browser workload.
-- Improves application performance in low bandwidth situations.
-- Improves user experience at initial loading.
-- Optimizes resource usage.
-
-#### Disadvantages of Lazy Loading
-- Not suitable for small-scale applications.
-- Placeholders can slow down quick scrolling.
-- Requires additional communication with the server to fetch resources.
-- Can affect SEO and ranking.
-
-
-## Code:
-```
-// Without React.lazy()
-import AboutComponent from './AboutComponent ';
-
-// With React.lazy()
-const AboutComponent = React.lazy(() => import('./AboutComponent '));
-
-const HomeComponent = () => (
-    <div><AboutComponent /></div>
-)
-```
-
-## React.Suspense:
-
-- When we use lazy loading, components are rendered as we navigate. 
-- So, we need to have a placeholder for those components until they are loaded. 
-- As a solution, React.Suspense was introduced, and it acts as a wrapper for the lazy components.
-- You can wrap a single lazy component, multiple lazy components, or multiple lazy components with different hierarchy levels with React.Suspense. 
-- In addition, it accepts a prop named fallback as the placeholder, and you can pass a component or an element for that.
-
-For example, you can pass the waiting or loading message as the fallback prop, and it will be displayed until the wrapped lazy component is rendered.
-
-```
-import React, { Suspense } from "react";
-const AboutComponent = React.lazy(() => import('./AboutComponent'));
-
-const HomeComponent = () => (
-    <div><Suspense fallback = { <div> Please Wait... </div> } >
-            <AboutComponent /></Suspense></div>
-);
-```
-
-```
-As you can see, you need to use both the React.lazy() and React.Suspense features to build a lazy-loading component in React. 
-These features are straightforward and anyone with basic React knowledge can easily use them.
-```
-
-## Memory Leak:
-```
-A Memory leak is a commonly faced issue when developing React applications. 
-A memory leak is a type of **resource leak** that occurs when an application incorrectly manages memory allocations. 
-That memory, which is not needed anymore, is not released for other processes to use. 
-A memory leak may also happen when an object is stored in a memory, but cannot be accessed by the running code.
-```
-
-## Why should you clean up memory leaks?
-```
-Memory leaks are commonly faced issues when developing React applications. 
-```
-
-### It causes many problems, including:
-
-- Affecting the project’s performance by reducing the amount of available memory;
-- Slowing down the application;
-- Refreshing the page randomly;
-- Crashing the system;
-- Overloading database with huge amounts of queries;
-
-## What causes a memory leak?
-
-```
-A memory leak appears when React applications created subscriptions that were made when a component was mounted and
-did not unsubscribe them when those components were unmounted.
-```
-### These subscriptions could be:
-
-- DOM Event listeners;
-- WebSocket subscriptions;
-- Requests to an API;
-
-## How to clean up memory leaks?
-```
-Modern programming languages and frameworks have techniques for clearing out data that is no longer needed. And react is not an exception.
-```
-
-Basically, we need to remove subscriptions when the component unmounts. For that there are three ways:
-
-1. Clearing Intervals
-```
-You may use setInterval function for creating repeating tasks every second or so. This will likely result in a memory leak error and it must be cleared after unmounting.
-```
-
-## Code
-
-```
- useEffect(() => {
-    let isMounted = true;
-    
-    const interval = setInterval(() => {
-      if (isMounted) {
-        getData(cookiesList);
-      }
-    }, 5000);
-
-    return () => {
-      isMounted = false;
-      clearInterval(interval);
-    };
-  });
-```
-
-## How to detect memory leaks?
-```
-There is a way to detect memory leaks before you get the error from react. Simply use google chrome’s developers tools. 
-Go to Memory tab take heap snapshots and do a comparison between times before you took an action
-```
-
-## Error Boundaries:
- ```
- Error Boundaries basically provide some sort of boundaries or checks on errors, 
- They are React components that are used to handle JavaScript errors in their child component tree.
- ```
- 
- ## Pure Function:
- ```
- A React component is considered pure if it renders the same output for the same state and props. 
- For this type of class component, React provides the PureComponent base class.
-```
-- Its return value is only determined by its input values
-- Its return value is always the same for the same input values
-
-## Code:
 ```
 import React from 'react';
 
-class PercentageStat extends React.PureComponent {
-
-  render() {
-    const { label, score = 0, total = Math.max(1, score) } = this.props;
-
-    return (
-      <div>
-        <h6>{ label }</h6>
-        <span>{ Math.round(score / total * 100) }%</span>
-      </div>
-    )
-  }
-
+function HomePage() {
+  return (
+    <div>
+      <h1>Welcome to the homepage</h1>
+      <p>This is the homepage of our app.</p>
+    </div>
+  );
 }
 
-export default PercentageStat;
+export default HomePage;
 ```
+
+## Pure Component:
+ 
+#### pure components are a type of React component that only re-renders if its props or state changes, while class components have an internal state and can use lifecycle methods to manage it. Functional components are also a type of React component that don't have an internal state, but can receive props and use them to render UI elements.
+
+### with class component
+
+```
+import React, { PureComponent } from 'react';
+
+class MyPureComponent extends PureComponent {
+  render() {
+    const { prop1, prop2 } = this.props;
+    return (
+      <div>
+        <p>Prop 1: {prop1}</p>
+        <p>Prop 2: {prop2}</p>
+      </div>
+    );
+  }
+}
+
+export default MyPureComponent
+
+```
+
 
 ## HOC component:
 ```
@@ -1571,143 +1455,5 @@ export default EnhancedComponent
 ```
 ## Output:
 <img src="https://media.geeksforgeeks.org/wp-content/cdn-uploads/20210310121357/20210310_121315.gif" />
-
-
-# API (Application Programming Interface)
-
-```
-API is an abbreviation for Application Programming Interface which is a collection of communication protocols and subroutines 
-used by various programs to communicate between them.
-A programmer can make use of various API tools to make its program easier and simpler. 
-Also, an API facilitates the programmers with an efficient way to develop their software programs.
-```
-
-## How we fetch the data from API 
-
-## Using Fetch Method:
-
-```
-import React from "react";
-import './App.css';
-class App extends React.Component {
-
-	// Constructor
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			items: [],
-			DataisLoaded: false
-		};
-	}
-
-	// ComponentDidMount is used to
-	// execute the code
-	componentDidMount() {
-		fetch(
-"https://jsonplaceholder.typicode.com/users")
-			.then((res) => res.json())
-			.then((json) => {
-				this.setState({
-					items: json,
-					DataisLoaded: true
-				});
-			})
-	}
-	render() {
-		const { DataisLoaded, items } = this.state;
-		if (!DataisLoaded) return <div>
-			<h1> Pleses wait some time.... </h1> </div> ;
-
-		return (
-		<div className = "App">
-			<h1> Fetch data from an api in react </h1> {
-				items.map((item) => (
-				<ol key = { item.id } >
-					User_Name: { item.username },
-					Full_Name: { item.name },
-					User_Email: { item.email }
-					</ol>
-				))
-			}
-		</div>
-	);
-}
-}
-
-export default App;
-```
-
-## Output:
-
-<img src="https://media.geeksforgeeks.org/wp-content/uploads/20210817165343/out.gif" />
-
-# Using Axios
-```
-Use npm i axios to install axios and then add it as an import to your parent component. 
-I’m going to use axios to get all of my notes, which I stored in a database.
-```
-## Output:
-
-<img src="https://levelup.gitconnected.com/fetch-api-data-with-axios-and-display-it-in-a-react-app-with-hooks-3f9c8fa89e7b" />
-
-## Fetch API using async/await:
-
-```
-import React, { useState, useEffect } from 'react'
-import axios from 'axios';
-
-function App() {
-
-	const [loading, setLoading] = useState(false);
-	const [posts, setPosts] = useState([]);
-
-	useEffect(() => {
-		const loadPost = async () => {
-
-			// Till the data is fetch using API
-			// the Loading page will show.
-			setLoading(true);
-
-			// Await make wait until that
-			// promise settles and return its result
-			const response = await axios.get(
-			"https://jsonplaceholder.typicode.com/posts/");
-
-			// After fetching data stored it in posts state.
-			setPosts(response.data);
-
-			// Closed the loading page
-			setLoading(false);
-		}
-
-		// Call the function
-		loadPost();
-	}, []);
-
-	return (
-		<>
-			<div className="App">
-				{loading ? (
-					<h4>Loading...</h4>) :
-					(posts.map((item) =>
-						// Presently we only fetch
-						// title from the API
-						<h4>{item.title}</h4>)
-					)
-				}
-			</div>
-		</>
-	);
-}
-
-export default App;
-
-```
-
-## Output:
-
-<img src="https://www.geeksforgeeks.org/how-to-fetch-data-from-apis-using-asynchronous-await-in-reactjs/" />
-
 
 
