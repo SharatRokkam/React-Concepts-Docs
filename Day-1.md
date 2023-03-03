@@ -238,3 +238,143 @@ That being said, function components are generally considered the better choice 
 | Also known as Stateless components as they simply accept data and display them in some form, that they are mainly responsible for rendering UI. | Also known as Stateful components because they implement logic and state. |
 |React lifecycle methods (for example, componentDidMount) cannot be used in functional components. | React lifecycle methods can be used inside class components (for example, componentDidMount). |
 
+## CSS STYLING IN REACT: -
+
+In React we can apply styling in multiple ways, here we will look into the most commonly used methods.
+
+
+- Inline Styling
+- Creating State object variable
+- Sharing style across many React components
+- Styled Components
+
+
+# Inline Styling:
+
+In React just like CSS, we can apply the styling directly to the element by adding style attribute, but unlike CSS since the inline CSS is written in a javascript object, properties with hyphens separators like background-color must be written with camel case syntax. While applying inline styling the first curly brackets inject JavaScript in JSX and the second curly brackets create an object :
+
+![InlineStyling](https://user-images.githubusercontent.com/94468010/222709996-cac45b3a-714a-4571-a996-8932f2585ad1.png)
+
+
+# Creating a State Object Variable 
+This is the other way of styling in react, where we can create Javascript objects, and instead of writing inline styling, we pass objects to elements in style attribute directly.
+
+![StyleObject](https://user-images.githubusercontent.com/94468010/222710071-7b80c223-5ed0-4855-a695-a6ca90de7622.png)
+
+
+# Sharing Style across many react Components
+
+The style objects and the components do not have to be in the same file. We can create a separate .js file for our styles, export these styles, and then import them into the component where we want to use them. Doing this makes styles reusable across multiple components.
+
+
+we can export each style object individually, which will also mean importing them individually. That might get tedious if there are many style objects in the file.
+
+![AppObject](https://user-images.githubusercontent.com/94468010/222710191-1dcef51b-3b8c-48b9-a027-fbbea4af63c8.png)
+
+
+![ExportStyleObject](https://user-images.githubusercontent.com/94468010/222710205-6a2e377c-7d46-4f51-862e-3ed933d02536.png)
+
+
+
+
+
+
+
+
+CONDITIONAL RENDERING :
+
+In React conditional rendering means to render something if the given condition is true, to follow this concept we can always use traditional if-else statements but in addition to that React allows 
+Ternary operators and Logical && operator to put something in condition.
+
+
+
+You can return a JSX expression conditionally with an if statement.
+You can conditionally save some JSX to a variable and then include it inside other JSX by using the curly braces.
+In JSX,  {cond ? <A /> : <B />} means if “cond is true, render A else B ”.
+In JSX, {cond && <A />} means if “cond is true, render A otherwise nothing.
+
+```
+class App extends Component {
+  // ...
+
+  render() {
+    let {isLoggedIn} = this.state;
+
+    const renderAuthButton = () => {
+      if (isLoggedIn) {
+        return <button>Logout</button>;
+      } else {
+        return <button>Login</button>;
+      }
+    }
+
+    return (
+      <div className="App">
+        <h1>
+          This is a Demo showing several ways to implement Conditional Rendering in React.
+        </h1>
+        {renderAuthButton()}
+      </div>
+    );
+  }
+}
+```
+
+```
+src/App.js
+import React, { Component } from "react";
+import './App.css';
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoggedIn: true
+    };
+  }
+
+  render() {
+    let { isLoggedIn } = this.state;
+
+    return (
+      <div className="App">
+        <h1>
+          This is a Demo showing several ways to implement Conditional Rendering in React.
+        </h1>
+        {isLoggedIn ? <button>Logout</button> : <button>Login</button>}
+      </div>
+    );
+  }
+}
+
+export default App;
+```
+
+```
+import React, { Component } from "react";
+import './App.css';
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoggedIn: true
+    };
+  }
+
+  render() {
+    let { isLoggedIn } = this.state;
+
+    return (
+      <div className="App">
+        <h1>
+          This is a Demo showing several ways to implement Conditional Rendering in React.
+        </h1>
+        {isLoggedIn && <button>Logout</button>}
+      </div>
+    );
+  }
+}
+
+export default App;
+```
