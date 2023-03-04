@@ -242,7 +242,7 @@ That being said, function components are generally considered the better choice 
 
 # -------------- Day-2 -----------------
 
-## CSS STYLING IN REACT: -
+# CSS STYLING IN REACT: -
 
 In React we can apply styling in multiple ways, here we will look into the most commonly used methods.
 
@@ -253,7 +253,7 @@ In React we can apply styling in multiple ways, here we will look into the most 
 - Styled Components
 
 
-# Inline Styling:
+### Inline Styling:
 
 In React just like CSS, we can apply the styling directly to the element by adding style attribute, but unlike CSS since the inline CSS is written in a javascript object, properties with hyphens separators like background-color must be written with camel case syntax. While applying inline styling the first curly brackets inject JavaScript in JSX and the second curly brackets create an object :
 
@@ -264,7 +264,7 @@ return <div style={{ color: 'blue', lineHeight : 10, padding: 20 }}> Inline Styl
 ```
 
 
-# Creating a State Object Variable 
+### Creating a State Object Variable 
 This is the other way of styling in react, where we can create Javascript objects, and instead of writing inline styling, we pass objects to elements in style attribute directly.
 
 ```
@@ -298,7 +298,7 @@ export default MyComponent;
 
 
 
-# Sharing Style across many react Components
+### Sharing Style across many react Components
 
 The style objects and the components do not have to be in the same file. We can create a separate .js file for our styles, export these styles, and then import them into the component where we want to use them. Doing this makes styles reusable across multiple components.
 
