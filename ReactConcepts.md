@@ -253,13 +253,45 @@ In React we can apply styling in multiple ways, here we will look into the most 
 
 In React just like CSS, we can apply the styling directly to the element by adding style attribute, but unlike CSS since the inline CSS is written in a javascript object, properties with hyphens separators like background-color must be written with camel case syntax. While applying inline styling the first curly brackets inject JavaScript in JSX and the second curly brackets create an object :
 
-![InlineStyling](https://user-images.githubusercontent.com/94468010/222709996-cac45b3a-714a-4571-a996-8932f2585ad1.png)
+```
+export default function MyComponent(){  
+return <div style={{ color: 'blue', lineHeight : 10, padding: 20 }}> Inline Styled Component</div>  
+}  
+```
 
 
 # Creating a State Object Variable 
 This is the other way of styling in react, where we can create Javascript objects, and instead of writing inline styling, we pass objects to elements in style attribute directly.
 
-![StyleObject](https://user-images.githubusercontent.com/94468010/222710071-7b80c223-5ed0-4855-a695-a6ca90de7622.png)
+```
+import React, { useState } from 'react';
+
+function MyComponent() {
+  const [isClicked, setIsClicked] = useState(false);
+
+  const styles = {
+    backgroundColor: isClicked ? 'red' : 'green',
+    color: 'white',
+    padding: '10px',
+    borderRadius: '5px',
+    textAlign: 'center'
+  };
+
+  function handleClick() {
+    setIsClicked(!isClicked);
+  }
+
+  return (
+    <div style={styles} onClick={handleClick}>
+      <h1>Hello World</h1>
+      <p>This is a paragraph</p>
+    </div>
+  );
+}
+
+export default MyComponent;
+```
+
 
 
 # Sharing Style across many react Components
@@ -269,14 +301,38 @@ The style objects and the components do not have to be in the same file. We can 
 
 we can export each style object individually, which will also mean importing them individually. That might get tedious if there are many style objects in the file.
 
-![AppObject](https://user-images.githubusercontent.com/94468010/222710191-1dcef51b-3b8c-48b9-a027-fbbea4af63c8.png)
+### sharedStyles.js
 
+```
+const button = {
+  background-color: blue;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+}
 
-![ExportStyleObject](https://user-images.githubusercontent.com/94468010/222710205-6a2e377c-7d46-4f51-862e-3ed933d02536.png)
+export const style ={
+button : button
+}
+```
 
+### App.js
 
+```
+import React from 'react';
+import styles from './sharedStyles.js';
 
+function Button() {
+  return (
+    <button className={styles.button}>
+      Click me
+    </button>
+  );
+}
 
+export default Button;
+```
 
 
 
@@ -857,9 +913,9 @@ Some key differences between lifecycle methods and hooks include:
 
 4. Hooks can be used to share stateful logic between components, whereas with class components, this would require using higher-order components or render props.
 
-| Lifecycle Example    | Hooks Example             |
-| :-------- | :------- | :------------------------- |
-| `class MyComponent extends React.Component {
+- Lifecycle Example
+```
+class MyComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -891,7 +947,12 @@ Some key differences between lifecycle methods and hooks include:
       </div>
     );
   }
-}` | `import React, { useState, useEffect } from 'react';
+}
+```
+
+- Hooks Example
+```
+import React, { useState, useEffect } from 'react';
 
 function MyComponent() {
   const [count, setCount] = useState(0);
@@ -918,11 +979,10 @@ function MyComponent() {
       <button onClick={() => handleIncrement()}>Increment</button>
     </div>
   );
-} ` |
+}
+```
 
 
-
-# Hooks
 
 ### What is Props-Drilling?
 
@@ -1042,6 +1102,8 @@ In this example, we import the ThemeContext and use the useContext hook to get a
 This is just a basic example, but the Context API can be used for more complex data sharing scenarios, like passing user authentication information or language preferences down the component tree.
  
  
+# Hooks
+ 
 # useState:
 
 - useState is a hook in React that allows functional components to have state. In class components, state is defined using a class property called state. However, with functional components, stateful logic had to be implemented using class components, making the code more verbose and harder to read.
@@ -1105,6 +1167,7 @@ function Form() {
 - 
 
 # useEffect:
+
 ```
 In useEffect, The word effect refers to a functional programming term called a "side effect".
 **Side-Effects**
@@ -1158,9 +1221,39 @@ function User({ name }) {
 - And any time any dependency value changes
 - you can add multiple values by separating them by commas
 
-## Code 
+```
+import React, { useState, useEffect } from 'react';
 
-![Screenshot 2023-02-28 145946](https://user-images.githubusercontent.com/94469107/221811103-7e163ef9-8791-4eba-a6c3-a6518c7686dd.png)
+function ExampleComponent() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    // Update the document title using the browser API
+    document.title = `You clicked ${count} times`;
+  });
+
+  function handleButtonClick() {
+    setCount(count + 1);
+  }
+
+  return (
+    <div>
+      <p>You clicked the button {count} times</p>
+      <button onClick={handleButtonClick}>Click me</button>
+    </div>
+  );
+}
+
+```
+
+- In this example, we use useEffect to update the document title whenever the count state variable changes. The useEffect hook takes a function as its first argument, which is executed after every render of the component. In this case, the function updates the document title using the document.title property, which is part of the browser API.
+
+- The second argument of useEffect is an array of dependencies. When any of the dependencies change, the function passed to useEffect is re-executed. If the dependencies array is empty, the function is only executed once, when the component mounts.
+
+- Note that the function passed to useEffect can return a cleanup function, which is executed when the component unmounts or before it re-renders. The cleanup function is useful for canceling any ongoing asynchronous operations or for cleaning up resources.
+
+
+
 
 # useMemo:
 
@@ -1396,23 +1489,7 @@ We call `resizeTextarea` whenever the content of the `textarea` changes by attac
 
 By using the `useRef` hook, we can get a reference to the `textarea` element and manipulate its properties and styles directly, which can be useful for implementing custom behavior that is not available through props or state.
 
-## Stylig with Material UI
-- Material UI is an open-source React component library that implements Google's Material Design. 
-- It includes a comprehensive collection of prebuilt components that are ready for use in production right out of the box.
-
-#### Installing Material UI
-`$ npm install @material-ui/core @material-ui/icons`
-
-## Button
-
-![Screenshot 2023-03-01 124609](https://user-images.githubusercontent.com/94469107/222069903-d2103370-83ea-47cb-a7a6-8264bdb10b84.png)
-
-## ColorPicker
-
-![Screenshot 2023-03-01 124819](https://user-images.githubusercontent.com/94469107/222070287-61f0fd15-a016-4906-b53b-9753abe9390a.png)
-
-
-# Form
+# Form with Hooks
 
 ## useState + Form
 
@@ -1518,225 +1595,6 @@ ReactDOM.render(
 );
 ```
 
-## useReducer + Form
-
-```
-import { useReducer } from "react"
-
-type FormState = {
-    firstName: string
-    lastName: string
-    age: string
-    email: string
-    password: string
-}
-const initialState: FormState = {
-    firstName: "",
-    lastName: "",
-    age: "",
-    email: "",
-    password: ""
-}
-type FormValidityState = {
-    firstNameError: boolean
-    lastNameError: boolean
-    ageError: boolean
-    emailError: boolean
-    passwordError: boolean
-    isFormValid: boolean
-}
-const initialValidityState: FormValidityState = {
-    firstNameError: false,
-    lastNameError: false,
-    ageError: false,
-    emailError: false,
-    passwordError: false,
-    isFormValid: false
-}
-type FormAction = {
-    type: string
-    payLoad: string
-}
-type FormValidityAction = {
-    type: string
-    payLoad: FormState
-}
-const formReducer = (state: FormState, action: FormAction): FormState => {
-    switch(action.type){
-        case "UPDATE_FIRST_NAME": return{
-            ...state, firstName: action.payLoad, 
-        }
-        case "UPDATE_LAST_NAME": return{
-            ...state,lastName: action.payLoad, 
-        }
-        case "UPDATE_AGE": return{
-            ...state, age: action.payLoad, 
-        }
-        case "UPDATE_EMAIL": return{
-            ...state, email: action.payLoad, 
-        }
-        case "UPDATE_PASSWORD": return{
-            ...state, password: action.payLoad, 
-        }
-        default:
-            return state
-    }
-}
-const formValidityReducer = (state: FormValidityState, action: FormValidityAction): FormValidityState => {
-    let isValid: boolean = false;
-    switch(action.type){
-        
-        case "VALIDATE_FIRST_NAME": 
-        isValid = action.payLoad.firstName.length > 0 ? true: false
-        return{
-            ...state,
-            ...({firstNameError: !isValid, isFormValid: isValid && !state.lastNameError && !state.ageError && !state.emailError && !state.passwordError}),
-        }
-        case "VALIDATE_LAST_NAME": 
-        isValid = action.payLoad.lastName.length > 0 ? true: false
-        return{
-            ...state,
-            ...({lastNameError: !isValid, isFormValid: isValid && !state.firstNameError && !state.ageError && !state.emailError && !state.passwordError})
-        }
-        case "VALIDATE_AGE": 
-        isValid = action.payLoad.age.length > 0 ? true: false
-        return{
-            ...state,
-            ...({ageError: !isValid, isFormValid: isValid && !state.firstNameError && !state.lastNameError && !state.emailError && !state.passwordError})
-        }
-        case "VALIDATE_EMAIL": 
-        isValid = (action.payLoad.email.length > 0 && action.payLoad.email.includes("@")) ? true: false
-        return{
-            ...state,
-            ...({emailError: !isValid, isFormValid: isValid && !state.firstNameError && !state.lastNameError && !state.ageError && !state.passwordError})
-        }
-        case "VALIDATE_PASSWORD": 
-        isValid = action.payLoad.password.length > 9 ? true: false
-        return{
-            ...state,
-            ...({passwordError: !isValid, isFormValid: isValid && !state.firstNameError && !state.lastNameError && !state.ageError && !state.emailError})
-        }
-    default:
-        return state
-    }
-}
-
-export const Form = () => {
-    const [formData, setFormData] = useReducer(formReducer, initialState)
-    const [formValidityData, setFormValidityData] = useReducer(formValidityReducer, initialValidityState)
-
-    const onButtonPress = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault()
-        console.log(formData)
-        //Form submission happens here
-    }
-    return(
-        <div style={STYLE.container}>
-        <form onSubmit={onButtonPress}>
-            <label style={STYLE.formElement} htmlFor="first_name">First Name</label>
-            <div style={STYLE.formElement}>
-                <input 
-                id="first_name" 
-                style={{backgroundColor:formValidityData.firstNameError ?"pink" : ""}} 
-                onChange={(e) =>setFormData({type:"UPDATE_FIRST_NAME", payLoad:e.target.value})}
-                onBlur={(e) => setFormValidityData({type: "VALIDATE_FIRST_NAME", payLoad: formData})}
-                type="text"/>
-            </div>
-           <label style={STYLE.formElement} htmlFor="last_name">Last Name</label>
-            <div style={STYLE.formElement}>
-                <input 
-                id="last_name" 
-                style={{backgroundColor:formValidityData.lastNameError ? "pink" : ""}} 
-                onChange={(e) =>setFormData({type:"UPDATE_LAST_NAME", payLoad:e.target.value})}
-                onBlur={(e) => setFormValidityData({type: "VALIDATE_LAST_NAME", payLoad: formData})}
-                type="text"/>
-            </div>
-            <label style={STYLE.formElement} htmlFor="last_name">Email</label>
-            <div style={STYLE.formElement}>
-                <input 
-                id="email" 
-                style={{backgroundColor:formValidityData.emailError ? "pink" : ""}} 
-                onChange={(e) =>setFormData({type:"UPDATE_EMAIL", payLoad:e.target.value})}
-                onBlur={(e) => setFormValidityData({type: "VALIDATE_EMAIL", payLoad: formData})}
-                type="text"/>
-            </div>
-            <label style={STYLE.formElement} htmlFor="last_name">Password</label>
-            <div style={STYLE.formElement}>
-                <input 
-                id="password" 
-                style={{backgroundColor:formValidityData.passwordError ? "pink" : ""}} 
-                onChange={(e) =>setFormData({type:"UPDATE_PASSWORD", payLoad:e.target.value})}
-                onBlur={(e) => setFormValidityData({type: "VALIDATE_PASSWORD", payLoad: formData})}
-                type="password"/>
-            </div>
-           <label style={STYLE.formElement} htmlFor="age">Age</label>
-            <div style={STYLE.formElement}>
-                <input 
-                id="age" 
-                style={{backgroundColor:formValidityData.ageError ? "pink" : ""}} 
-                onChange={(e) =>setFormData({type:"UPDATE_AGE", payLoad:e.target.value})} 
-                onBlur={(e) => setFormValidityData({type: "VALIDATE_AGE", payLoad: formData})}
-                type="number"/>
-            </div>
-            <div style={STYLE.formElement}>
-                <input disabled={!formValidityData.isFormValid} type="submit" value={""+formValidityData.isFormValid}/>
-            </div>
-        </form>
-        </div>
-    )
-}
-const STYLE = {
-    container: {
-        borderRadius: "5px",
-        backgroundColor: "#f2f2f2",
-        padding: "20px",
-        maxWidth:"240px"
-    },
-    formElement: {
-        padding: "6px 24px"
-    }
-}
-```
-
-## useRef + Form
-
-```
-import React, { useRef } from "react"
-
-export default function App() {
-  const nameRef = useRef();
-  const emailRef = useRef()
-  const passwordRef = useRef()
-
-  function handleSubmit(e) {
-    e.preventDefault()
-    //output the name
-    console.log(nameRef.current.value)
-    //output the email
-    console.log(emailRef.current.value)
-  }
-
-  return (
-    <div className="container">
-      <form onSubmit={handleSubmit}>
-        <div className="input_group">
-          <label>Name</label>
-          <input type="text" ref={nameRef}/>
-        </div>
-        <div className="input_group">
-          <label>Email</label>
-          <input type="text" ref={emailRef}/>
-        </div>
-        <div className="input_group">
-          <label>Password</label>
-          <input type="password" ref={passwordRef}/>
-        </div>
-        <input type="submit"/>
-      </form>
-    </div>
-  )
-}
-```
 
 # React Router
 
@@ -1828,6 +1686,65 @@ function HomePage() {
 
 export default HomePage;
 ```
+
+## 404 Error Page 
+
+### NotFound Component (NotFound.jsx)
+
+```
+import React from 'react';
+
+function NotFound() {
+  return (
+    <div>
+      <h1>404 - Not Found</h1>
+      <p>The page you are looking for does not exist.</p>
+    </div>
+  );
+}
+
+export default NotFound;
+```
+### App Component (App.js)
+
+```
+import React from 'react';
+import { Route, Switch } from 'react-router-dom';
+import NotFound from './NotFound';
+// import other components and routes
+
+function App() {
+  return (
+    <div>
+      <Switch>
+        <Route exact path='/' component={Home} />
+        <Route path='/about' component={About} />
+        <Route path='/contact' component={Contact} />
+        <Route path='*' component={NotFound} />
+      </Switch>
+    </div>
+  );
+}
+
+export default App;
+```
+
+### index.js
+
+```
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+
+ReactDOM.render(
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>,
+  document.getElementById('root')
+);
+```
+
 
 ## Pure Component:
  
@@ -1930,4 +1847,243 @@ export default EnhancedComponent
 ## Output:
 <img src="https://media.geeksforgeeks.org/wp-content/cdn-uploads/20210310121357/20210310_121315.gif" />
 
+
+# Day-6
+
+# API Calls
+
+# Web APIs
+- API stands for Application Programming Interface. The most popular Web Api used is a Representational state transfer API or RESTful API. Web APIs are used to fetch data from a database and save data back to the database. Using Web APIs requires the use of HTTP request methods there are different HTTP request methods like GET,POST,PUT,DELETE, etc. Let’s have a brief description of the mentioned HTTP request.
+
+1. GET: Used to request data from an endpoint
+2. POST: Sends data to an endpoint
+3. DELETE: Remove data from an endpoint.
+4. PUT: Update a record or data value at an endpoint.
+
+
+## Ways of Fetching Data from API
+There are different of fetching data:
+
+- By using Fetch API
+- By using Axios library
+- By using async-await syntax
+- By using custom hooks
+
+## 1. Fetch API
+- We can fetch data by using javascript fetch() method. It will request sever and load the information on the web pages. It will return a promise.
+
+- Let’s start with the example. We will create a fetchData() method. It will call fetch() the method with the given URL then converts the result to a JSON object.
+
+```
+import React, { useEffect, useState } from "react";
+
+function App() { 
+  const [user, setUser] = useState([]);
+
+  const fetchData = () => {
+    return fetch("https://jsonplaceholder.typicode.com/users")
+          .then((response) => response.json())
+          .then((data) => setUser(data));
+  }
+
+  useEffect(() => {
+    fetchData();
+  },[])
+
+  return (
+    <main>
+      <h1>User List</h1>
+      <ul>
+        {user && user.length > 0 && user.map((userObj, index) => (
+            <li key={userObj.id}>{userObj.name}</li>
+          ))}
+      </ul>
+    </main>
+  );
+}
+
+export default App;
+```
+
+## 2. Axios
+
+- Axios is a javascript library that we use to make HTTP requests same as fetch(). There is a difference between these two as in fetch() we have to convert the result to a JSON object but in Axios it already returns the result as a JSON object, so we don’t need to convert it.
+
+Let’s take the example of Axios library. First, we have to install the Axios library then we have to import Axios from Axios.
+
+### Installation
+
+```
+npm i axios
+```
+
+### Get Data using Axios
+```
+import React from 'react';
+ import axios from 'axios';
+ export default class MyList extends React.Component {
+  state = {
+  persons: []
+  }
+ componentDidMount() {
+  axios.get(`https://jsonplaceholder.typicode.com/users`)
+  .then(response => {
+const users = response.data;
+  this.setState ({users});
+  })
+  }
+ render() {
+  return (
+  < ul >
+  {this.state.users.map (user =>  {user.name}   )}
+  < /ul >
+  )
+  }
+ }
+```
+
+### POST Data using Axios
+
+```
+import React from 'react';
+import axios from 'axios';
+export default class AddUser extends React.Component {
+ state = {
+ userName: '',
+ }
+ handleChange = event => {
+ this.setState({ userName: event.target.value });
+ }
+ handleSubmit = event => {
+ event.preventDefault();
+ const user = {
+ userName: this.state.userName
+ };
+ axios.post(`https://jsonplaceholder.typicode.com/users`, { user })
+ .then(res => {
+ console.log(res);
+ console.log(res.data);
+ })[Text Wrapping Break] }
+ render() {
+ return (
+ <div>
+ <form onSubmit={this.handleSubmit}>
+ <label>
+ User Name:
+ <input type="text" name="name" onChange={this.handleChange}/>
+ </label>
+ <button type="submit">Add</button>
+ </form>
+ </div>
+ )
+ }
+ }
+```
+
+### DELETE using Axios
+
+- Axios delete accepts two parameters: url and optional config
+
+```
+axios.delete(url, { data: { foo: "bar" }, headers: { "Authorization": "***" } });
+```
+Consider the same code above and modify the request as follows:
+
+```
+handleSubmit = event => {
+  event.preventDefault();
+  axios.delete(`https://jsonplaceholder.typicode.com/users/${this.state.userName}`)
+  .then(res => {
+  console.log(res);
+  console.log(res.data);
+  })
+ } 
+```
+
+## 3. Using Async and Await
+
+```
+import { useState, useEffect } from 'react';
+
+function MyComponent() {
+  const [data, setData] = useState(null);
+  
+  async function fetchData() {
+  const response = await fetch('https://api.example.com/data');
+  const data = await response.json();
+  return data;
+}
+
+  useEffect(() => {
+    async function getData() {
+      const fetchedData = await fetchData();
+      setData(fetchedData);
+    }
+    getData();
+  }, []);
+
+  return (
+    <div>
+      {data ? (
+        // Render the data
+      ) : (
+        // Render a loading indicator or placeholder
+      )}
+    </div>
+  );
+}
+```
+
+
+## Create a Custom API and render data on screen
+
+- It's not recommended to create a custom API in React because React is a client-side library. However However, you can create a mock API in React using a technique called "mocking" or "stubbing", which involves simulating the behavior of a real API without actually making any HTTP requests. This can be useful for testing and prototyping purposes.
+
+```
+import { useState, useEffect } from "react";
+
+const mockData = [
+  { id: 1, name: "John", age: 30 },
+  { id: 2, name: "Jane", age: 25 },
+  { id: 3, name: "Bob", age: 40 }
+];
+
+function MyComponent() {
+  const [data, setData] = useState(null);
+
+  async function fetchData() {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(mockData);
+      }, 1000);
+    });
+  }
+
+  useEffect(() => {
+    async function getData() {
+      const fetchedData = await fetchData();
+      setData(fetchedData);
+    }
+    getData();
+  }, []);
+
+  return (
+    <div>
+      {data ? (
+        <ul>
+          {data.map((item) => (
+            <li key={item.id}>
+              {item.name} - {item.age}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>Loading...</p>
+      )}
+    </div>
+  );
+}
+
+export default MyComponent;
+```
 
