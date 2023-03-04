@@ -1,5 +1,7 @@
 # React Notes
 
+# -------------- Day-1 -----------------
+
 ## What is React.js?
 
 - React.js is a popular open-source JavaScript library used to build user interfaces for web applications. It was developed by Facebook and has been widely adopted by the web development community for its simplicity, speed, and flexibility.
@@ -238,6 +240,8 @@ That being said, function components are generally considered the better choice 
 | Also known as Stateless components as they simply accept data and display them in some form, that they are mainly responsible for rendering UI. | Also known as Stateful components because they implement logic and state. |
 |React lifecycle methods (for example, componentDidMount) cannot be used in functional components. | React lifecycle methods can be used inside class components (for example, componentDidMount). |
 
+# -------------- Day-2 -----------------
+
 ## CSS STYLING IN REACT: -
 
 In React we can apply styling in multiple ways, here we will look into the most commonly used methods.
@@ -347,7 +351,7 @@ You can return a JSX expression conditionally with an if statement.
 - In JSX,  {cond ? &lt;A /&gt; : &lt;B /&gt;} means if “cond is true, render A else B ”.
 - In JSX, {cond && &lt;A /&gt;} means if “cond is true, render A otherwise nothing.
 
-#### traditional if-else 
+#### Traditional if-else 
 ```
 class App extends Component {
 
@@ -375,7 +379,7 @@ class App extends Component {
 }
 ```
 
-#### ternary operators
+#### Ternary operators
 ```
 
 import React, { Component } from "react";
@@ -406,7 +410,7 @@ class App extends Component {
 
 export default App;
 ```
-#### short-circuit operator
+#### Short-circuit or Logical AND operator
 ```
 import React, { Component } from "react";
 import './App.css';
@@ -642,6 +646,8 @@ class MyComponent extends Component {
 export default MyComponent;
 ```
 The `componentDidUpdate` method is used to update the state if the count prop has changed since the last update. When the componentDidUpdate method is called, it receives the previous props as an argument (`prevProps`). We can compare the count prop from the previous props to the current props (`this.props.count`), and if they are different, we update the component's state with the new count value.
+
+# -------------- Day-3 -----------------
 
 # Form Handling 
 
@@ -982,7 +988,7 @@ function MyComponent() {
 }
 ```
 
-
+# -------------- Day-4 -----------------
 
 ### What is Props-Drilling?
 
@@ -1595,6 +1601,7 @@ ReactDOM.render(
 );
 ```
 
+# -------------- Day-5 -----------------
 
 # React Router
 
@@ -1848,9 +1855,9 @@ export default EnhancedComponent
 <img src="https://media.geeksforgeeks.org/wp-content/cdn-uploads/20210310121357/20210310_121315.gif" />
 
 
-# Day-6
+# -------------- Day-6 -----------------
 
-# API Calls
+# Application Programming Interface
 
 # Web APIs
 - API stands for Application Programming Interface. The most popular Web Api used is a Representational state transfer API or RESTful API. Web APIs are used to fetch data from a database and save data back to the database. Using Web APIs requires the use of HTTP request methods there are different HTTP request methods like GET,POST,PUT,DELETE, etc. Let’s have a brief description of the mentioned HTTP request.
