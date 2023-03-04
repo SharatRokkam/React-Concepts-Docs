@@ -309,15 +309,15 @@ we can export each style object individually, which will also mean importing the
 
 ```
 const button = {
-  background-color: blue;
-  color: white;
-  padding: 10px;
-  border-radius: 5px;
-  text-align: center;
+    backgroundColor: 'blue',
+    color: 'white',
+    padding: '10px',
+    borderRadius: '5px',
+    textAlign: 'center',
 }
 
-export const style ={
-button : button
+export const style = {
+    button: button
 }
 ```
 
