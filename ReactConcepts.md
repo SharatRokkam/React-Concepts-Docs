@@ -391,65 +391,536 @@ export default App;
 | State can be used for rendering dynamic changes with the components. | Props are used to communicate between two components. |
 | State cannot make components reusable. | Props can make components to re-usable. |
 
+## Passing props in both class and functional component
+
+#### class component
+
+```
+import React, { Component } from 'react';
+
+class Greeting extends Component {
+  render() {
+    const { name } = this.props;
+    return <h1>Hello, {name}!</h1>;
+  }
+}
+
+export default Greeting;
+```
+
+#### functional component
+
+```
+import React from 'react';
+
+const Greeting = (props) => {
+  return <h1>Hello, {props.name}!</h1>;
+};
+
+export default Greeting;
+```
+
+- In both examples, we define a component called Greeting that accepts a prop called name. In the class component, we access the prop using this.props.name, while in the functional component we access it using props.name.
+
+- To use these components in another component, we would pass the name prop like this:
+
+```
+<Greeting name="Alice" />
+```
+
+
 ## Pass Props Parent to Child Component 
 
-![Screenshot 2023-02-27 162940](https://user-images.githubusercontent.com/94469107/221546758-a25898ef-666f-4137-abcf-9422c4ee96bc.png)
+#### parent.jsx
+```
+import React, { Component } from 'react';
+import Child from './Child';
+
+class Parent extends Component {
+  state = {
+    name: "Mathew",
+    age: 30,
+    address: {
+      street: "123 Main St",
+      city: "Chennai",
+      state: "Tamil Nadu"
+    }
+  }
+
+  render() {
+    return <Child person={this.state} />;
+  }
+}
+
+export default Parent;
+```
+#### child.jsx
+
+```
+import React from 'react';
+
+const Child = (props) => {
+  const { name, age, address } = props.person;
+  return (
+    <div>
+      <h1>{name}, {age}</h1>
+      <p>{address.street}, {address.city}, {address.state}</p>
+    </div>
+  );
+};
+
+export default Child;
+```
+
+In this example, the `Parent` component has a state with three properties: `name`, `age`, and `address`. The Parent component passes its entire state object to the Child component as a prop called person.
+
+In the `Child` component, we destructure the person prop to get the `name`, `age`, and `address` properties. We then use those properties to render a header with the person's name and age, as well as a paragraph with their street address, city, and state.
+
+Note that we are able to pass complex data (an object containing multiple properties) as a prop from the parent component to the child component. We can then access the individual properties of that object in the child component using destructuring.
 
 ## Pass Props Child to Parent Component 
 
-![Screenshot 2023-02-27 164459](https://user-images.githubusercontent.com/94469107/221549637-b6863545-de2f-4c2f-9d39-99aed2e28ecc.png)
+#### Parent Component
+```
+import React, { Component } from 'react';
+import Child from './Child';
 
-## Update State
+class Parent extends Component {
+  state = {
+    message: ""
+  }
+
+  handleMessage = (message) => {
+    this.setState({ message });
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>Parent Component</h1>
+        <Child handleMessage={this.handleMessage} />
+        <p>Message from child: {this.state.message}</p>
+      </div>
+    );
+  }
+}
+
+export default Parent;
+```
+#### Child Component
+```
+import React, { useState } from 'react';
+
+const Child = (props) => {
+  const [message, setMessage] = useState("");
+
+  const handleChange = (event) => {
+    setMessage(event.target.value);
+  }
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    props.handleMessage(message);
+    setMessage("");
+  }
+
+  return (
+    <div>
+      <h2>Child Component</h2>
+      <form onSubmit={handleSubmit}>
+        <input type="text" value={message} onChange={handleChange} />
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  );
+};
+
+export default Child;
+```
+
+- In this example, the `Parent` component defines a state with a single property called `message`. The `Parent` component also defines a function called `handleMessage` that takes a message as an argument and updates the message state.
+The Parent component passes the `handleMessage` function down to the `Child` component as a prop called `handleMessage`.
+
+- The `Child` component has a form with an input field and a submit button. When the form is submitted, the `handleSubmit` function is called. This function calls the `handleMessage` function passed down from the parent with the current value of the message state.
+
+- The Parent component renders the Child component and passes the `handleMessage` function down as a prop. The Parent component also displays the value of the message state, which is updated when the `Child` component calls the handleMessage function.
+
+- We are able to pass a function from the parent component to the child component as a prop, and then call that function in the child component to update the state of the parent component. This allows us to pass data from the child component to the parent component.
+
+
+
+## Update State from props
+
+- In React, state is used to manage data that can change over time, while props are used to pass data from a parent component to a child component. It is generally not recommended to update the state directly from the props, as it can lead to bugs and unpredictable behavior.
+
+However, if you need to update the state based on the props, you can use the `componentDidUpdate` lifecycle method. This method is called every time the component is updated, and it receives the previous props and state as arguments. You can compare the previous props to the current props, and update the state accordingly.
 
 #### Code
 
-![Screenshot 2023-02-27 165338](https://user-images.githubusercontent.com/94469107/221551565-8f1b51f4-1854-4450-a517-4f098dfeace5.png)
+```
+import React, { Component } from 'react';
 
-#### Output
+class MyComponent extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: props.count,
+    };
+  }
 
-![update-state-on-props-change](https://user-images.githubusercontent.com/94469107/221552208-0d1cb97b-a641-4b8a-98ca-60e334978f2a.gif)
+  componentDidUpdate(prevProps) {
+    if (prevProps.count !== this.props.count) {
+      this.setState({ count: this.props.count });
+    }
+  }
+
+  render() {
+    return (
+      <div>
+        <p>Count: {this.state.count}</p>
+      </div>
+    );
+  }
+}
+
+export default MyComponent;
+```
+The `componentDidUpdate` method is used to update the state if the count prop has changed since the last update. When the componentDidUpdate method is called, it receives the previous props as an argument (`prevProps`). We can compare the count prop from the previous props to the current props (`this.props.count`), and if they are different, we update the component's state with the new count value.
+
+# Form Handling 
+
+### In React, there are two main approaches to form handling: `controlled components` and `uncontrolled components.`
+
+### Controlled Components
+
+- In controlled components, the form data is managed by React state. Every form element (such as input, textarea, and select) has a value property that is set by React and updated by React when the user types or selects a new value. The value of the form element is tied to a piece of state in the component, and changes to the form element update the state.
+
+```
+import React, { Component } from 'react';
+
+class ControlledForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: '',
+      email: '',
+      message: ''
+    };
+  }
+
+  handleChange = (event) => {
+    this.setState({ [event.target.name]: event.target.value });
+  }
+
+  handleSubmit = (event) => {
+    event.preventDefault();
+    console.log('Form submitted:', this.state);
+  }
+
+  render() {
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <label>
+          Name:
+          <input type="text" name="name" value={this.state.name} onChange={this.handleChange} />
+        </label>
+        <label>
+          Email:
+          <input type="email" name="email" value={this.state.email} onChange={this.handleChange} />
+        </label>
+        <label>
+          Message:
+          <textarea name="message" value={this.state.message} onChange={this.handleChange}></textarea>
+        </label>
+        <button type="submit">Submit</button>
+      </form>
+    );
+  }
+}
+
+export default ControlledForm;
+
+```
+### Uncontrolled Components
+
+- In uncontrolled components, the form data is managed by the DOM. The form elements have no corresponding state in the component, and their values are accessed directly from the DOM when the form is submitted.
+
+```
+import React, { Component } from 'react';
+
+class UncontrolledForm extends Component {
+  handleSubmit = (event) => {
+    event.preventDefault();
+    const formData = {
+      name: this.nameInput.value,
+      email: this.emailInput.value,
+      message: this.messageInput.value
+    };
+    console.log('Form submitted:', formData);
+  }
+
+  render() {
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <label>
+          Name:
+          <input type="text" ref={(input) => this.nameInput = input} />
+        </label>
+        <label>
+          Email:
+          <input type="email" ref={(input) => this.emailInput = input} />
+        </label>
+        <label>
+          Message:
+          <textarea ref={(input) => this.messageInput = input}></textarea>
+        </label>
+        <button type="submit">Submit</button>
+      </form>
+    );
+  }
+}
+
+export default UncontrolledForm;
+```
+
+- In this example, the form data is accessed directly from the DOM when the form is submitted. The `handleSubmit` method retrieves the values of the form elements using the ref attribute, and logs the form data to the console.
+
+### Working with Array of Objects
+
+- Working with an array of objects is a common task in many React applications. Here's an example of how you might use an array of objects in a React component.
+
+```
+import React, { useState } from 'react';
+
+const books = [
+  { id: 1, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald' },
+  { id: 2, title: 'To Kill a Mockingbird', author: 'Harper Lee' },
+  { id: 3, title: '1984', author: 'George Orwell' },
+];
+
+function BookList() {
+  const [bookList, setBookList] = useState(books);
+
+  const handleRemove = (id) => {
+    setBookList(bookList.filter(book => book.id !== id));
+  }
+
+  return (
+    <ul>
+      {bookList.map(book => (
+        <li key={book.id}>
+          <h2>{book.title}</h2>
+          <p>By {book.author}</p>
+          <button onClick={() => handleRemove(book.id)}>Remove</button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export default BookList;
+```
+
+### Synthetic Events
+
+- In React, a SyntheticEvent is a cross-browser wrapper around the browser's native event object. It normalizes the event properties and methods, making it consistent across different browsers.
+
+- When an event is fired in a React component, such as a button click or form submission, React creates a SyntheticEvent object and passes it as the argument to the event handler function. The SyntheticEvent contains all the relevant information about the event, such as the type of event, the target element, and any user input data.
+
+- The benefit of using SyntheticEvents is that they are pooled by React, meaning that the same SyntheticEvent object can be reused for different events. This can improve performance by reducing the number of objects created and garbage collected.
+
+```
+import React from 'react';
+
+function handleClick(event) {
+  event.preventDefault();
+  console.log('Button clicked!');
+}
+
+function Button() {
+  return (
+    <button onClick={handleClick}>Click me</button>
+  );
+}
+
+export default Button;
+```
+
+- When the button is clicked, React creates a SyntheticEvent object and passes it as the argument to the `handleClick` function. We can then use the SyntheticEvent to handle the button click event in a cross-browser compatible way.
+
+## List and Keys
+
+```
+function List(props) {
+  const items = props.items.map((item) =>
+    <li key={item.id}>{item.text}</li>
+  );
+  return (
+    <ul>{items}</ul>
+  );
+}
+
+const myList = [
+  { id: 1, text: 'Item 1' },
+  { id: 2, text: 'Item 2' },
+  { id: 3, text: 'Item 3' }
+];
+
+ReactDOM.render(
+  <List items={myList} />,
+  document.getElementById('root')
+);
+
+```
+
+- we're rendering a list of elements based on an array of objects called myList. We're using the map() method to create a new array of elements, and setting the key prop to the id property of each object in the myList array. This ensures that each element has a unique identifier.
+
+- By using the key prop, React can efficiently update the list of elements when changes are made to the myList array, such as adding or removing an item. If we didn't provide a key prop, React would have to re-render the entire list of elements, which can be less efficient.
 
 
-#### There are many methods but only Three methods are important:
+# Lifecycle Method
 
-1. constructor()
-```
-The Constructor() method is called with the props, as arguments, and you should always start by calling the super(props) before anything else, 
-this will initiate the parent's constructor method and allows the component to inherit methods from its parent (React.Component).
-```
-2. render()
-```
-The render() method is required, and is the method that actually outputs the HTML to the DOM.
-```
-3. componentDidMount()
-```
-This function is invoked immediately after the component is mounted to the DOM.
-You would use the componentDidMount lifecycle method to grab a DOM node from the component tree immediately after it’s mounted.
-```
-### Code
+In React class components, there are several lifecycle methods that are called at different stages of the component's lifecycle. These methods can be used to perform various operations, such as initializing the component, updating the component, or cleaning up after the component.
 
-![Screenshot 2023-02-26 225940](https://user-images.githubusercontent.com/94469107/221426409-818f55da-abaf-417c-8948-8d5fcc8b332e.png)
+Here is an overview of the most commonly used lifecycle methods in React class components:
 
-## Updating (altering existing nodes in the DOM)
-```
-Whenever a change is made to the state or props of a React component, the component is rerendered.
-In simple terms, the component is updated. This is the updating phase of the React component lifecycle.
-```
-1. componentDidUpdate()
-```
-The componentDidUpdate method is called after the component is updated in the DOM.
-```
-![Screenshot 2023-02-26 230627](https://user-images.githubusercontent.com/94469107/221426717-80dd9a5a-9027-4014-b0a1-ff24b65cc86a.png)
+- `constructor(props)` - This method is called when a new instance of the component is created. It is used to initialize the component's state and bind event handlers.
 
-## Unmounting (removing nodes from the DOM)
+- `render()` - This method is required and is called whenever the component needs to be rendered. It returns a React element that represents the component's user interface.
+
+- `componentDidMount()` - This method is called after the component has been mounted to the DOM. It is used to perform operations that require access to the DOM, such as fetching data from an API.
+
+- `componentDidUpdate(prevProps, prevState)` - This method is called after the component has been updated. It is used to perform operations that depend on the component's new props or state, such as updating the DOM or making a network request.
+
+- `shouldComponentUpdate(nextProps, nextState)` - This method is called before the component is updated. It is used to determine whether the component should be re-rendered or not. By default, React re-renders the component whenever its props or state change. However, this method can be used to optimize performance by preventing unnecessary re-renders.
+
+- `componentWillUnmount()` - This method is called before the component is unmounted from the DOM. It is used to perform any necessary cleanup, such as removing event listeners or canceling network requests.
+
 ```
-React has only one built-in method that gets called when a component is unmounted.
+import React from "react";
+
+export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: []
+    };
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  componentDidMount() {
+    fetch("https://api.example.com/data")
+      .then((response) => response.json())
+      .then((data) => {
+        this.setState({ data });
+      });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.data !== prevState.data) {
+      console.log("Data has changed");
+    }
+  }
+
+  handleClick() {
+    this.setState((prevState) => ({
+      data: [...prevState.data, "New item"]
+    }));
+  }
+
+  render() {
+    return (
+      <div>
+        <ul>
+          {this.state.data.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+        <button onClick={this.handleClick}>Add item</button>
+      </div>
+    );
+  }
+}
 ```
-1. componentWillUnmount()
-```
-The componentWillUnmount lifecycle method is invoked immediately before a component is unmounted and destroyed.
-```
-![Screenshot 2023-02-26 235509](https://user-images.githubusercontent.com/94469107/221429265-2002acb7-5790-4485-a4f2-a5149e6c7c43.png)
+
+# Lifecycle vs Hooks
+
+- Lifecycle methods are only available in class components, whereas hooks can be used in both class and functional components. Hooks were introduced in React 16.8 as a way to manage state and lifecycle methods in functional components.
+
+Some key differences between lifecycle methods and hooks include:
+
+1. Lifecycle methods are only available in class components, while hooks can be used in both class and functional components.
+
+2. Lifecycle methods are called in a specific order during a component's lifecycle, while hooks can be called in any order within a functional component.
+
+3. Hooks provide a more concise and functional way of managing state and lifecycle than using class components and lifecycle methods.
+
+4. Hooks can be used to share stateful logic between components, whereas with class components, this would require using higher-order components or render props.
+
+| Lifecycle Example    | Hooks Example             |
+| :-------- | :------- | :------------------------- |
+| `class MyComponent extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: 0,
+    };
+  }
+
+  componentDidMount() {
+    console.log('Component mounted');
+  }
+
+  componentDidUpdate() {
+    console.log('Component updated');
+  }
+
+  componentWillUnmount() {
+    console.log('Component will unmount');
+  }
+
+  handleIncrement() {
+    this.setState({ count: this.state.count + 1 });
+  }
+
+  render() {
+    return (
+      <div>
+        <p>Count: {this.state.count}</p>
+        <button onClick={() => this.handleIncrement()}>Increment</button>
+      </div>
+    );
+  }
+}` | `import React, { useState, useEffect } from 'react';
+
+function MyComponent() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    console.log('Component mounted');
+
+    return () => {
+      console.log('Component will unmount');
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log('Component updated');
+  }, [count]);
+
+  function handleIncrement() {
+    setCount(count + 1);
+  }
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => handleIncrement()}>Increment</button>
+    </div>
+  );
+} ` |
+
+
 
 # Hooks
 
