@@ -283,21 +283,22 @@ we can export each style object individually, which will also mean importing the
 
 ## CONDITIONAL RENDERING :
 
-# In React conditional rendering means to render something if the given condition is true, to follow this concept we can always use traditional if-else statements but in addition to that React allows Ternary operators and Logical && operator to put something in condition.
+- In React conditional rendering means to render something if the given condition is true, to follow this concept we can always use traditional if-else statements but in addition to that React allows Ternary operators and Logical && operator to put something in condition.
 
 
 You can return a JSX expression conditionally with an if statement.
 - You can conditionally save some JSX to a variable and then include it inside other JSX by using the curly braces.
-- In JSX,  {cond ? <A /> : <B />} means if “cond is true, render A else B ”.
-- In JSX, {cond && <A />} means if “cond is true, render A otherwise nothing.
+- In JSX,  {cond ? &lt;A /&gt; : &lt;B /&gt;} means if “cond is true, render A else B ”.
+- In JSX, {cond && &lt;A /&gt;} means if “cond is true, render A otherwise nothing.
 
+#### traditional if-else 
 ```
 class App extends Component {
-  // ...
 
   render() {
     let {isLoggedIn} = this.state;
-
+    
+    //if-else statement
     const renderAuthButton = () => {
       if (isLoggedIn) {
         return <button>Logout</button>;
@@ -318,8 +319,9 @@ class App extends Component {
 }
 ```
 
+#### ternary operators
 ```
-src/App.js
+
 import React, { Component } from "react";
 import './App.css';
 
@@ -339,6 +341,7 @@ class App extends Component {
         <h1>
           This is a Demo showing several ways to implement Conditional Rendering in React.
         </h1>
+	//use of ternary operators
         {isLoggedIn ? <button>Logout</button> : <button>Login</button>}
       </div>
     );
@@ -347,7 +350,7 @@ class App extends Component {
 
 export default App;
 ```
-
+#### short-circuit operator
 ```
 import React, { Component } from "react";
 import './App.css';
