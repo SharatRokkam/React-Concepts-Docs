@@ -2094,3 +2094,526 @@ function MyComponent() {
 export default MyComponent;
 ```
 
+# ---------------Day-7-----------------
+
+## Lazy Loading
+
+- Lazy loading is the technique of rendering only-needed or critical user interface items first, then quietly unrolling the non-critical items later. It is now fully integrated into core react library itself. We formerly used react-loadable to achieve this but now we have react.lazy() in react core. `React.lazy()` is a new function in react that lets you load react components lazily through code splitting without help from any additional libraries. 
+
+### Suspense
+- Suspense is a component required by the lazy function basically used to wrap lazy components. Multiple lazy components can be wrapped with the suspense component. It takes a fallback property that accepts the react elements you want to render as the lazy component is being loaded.
+
+### Why is Lazy Loading important?
+- Firstly, bundling involves aligning our code components in progression and putting them in one javascript chunk that it passes to the browser; but as our application grows, we notice that bundle gets very cumbersome in size. This can quickly make using your application very hard and especially slow. With Code splitting, the bundle can be split to smaller chunks where the most important chunk can be loaded first and then every other secondary one lazily loaded.
+- By using lazy loading, the application can reduce the amount of time and resources needed to load and render the page, leading to a faster and more efficient user experience.
+
+### Artist.js
+
+```
+import React from ‘react’;
+import ‘./App.css’;
+import artists from “./store”;
+export default function Artists(){
+ return (
+   <>
+   <h1>MTV Base Headline Artists 2019</h1>
+   {artists.map(artist =>(
+   <div id=”card-body” key={artist.id}>
+    <div className=”card”>
+     <h2>{artist.name}</h2>
+     <p>genre: {artist.genre}</p>
+     <p>Albums released: {artist.albums}</p>
+    </div>
+   </div>
+    ))}
+   </>
+);
+}
+```
+
+### Store.js
+
+```
+
+export const artists = [
+    {
+        id: '1',
+        name: 'Sharat',
+        country: 'India',
+        genre: 'K - Pop',
+        albums: '2'
+    },
+    {
+        id: '2',
+        name: 'Arijit',
+        country: 'India',
+        genre: 'Romantic',
+        albums: '3'
+    },
+    {
+        id: '3',
+        name: 'Honey Singh',
+        country: 'India',
+        genre: 'Pop',
+        albums: '5'
+    },
+    {
+        id: '4',
+        name: 'Raftaar',
+        country: 'India',
+        genre: 'Rap',
+        albums: '2'
+    },
+
+
+]; 
+```
+- To render a dynamic import as a regular component, the react documentation gives the react.lazy function syntax like so:
+- If the module containing the Artists is not yet loaded by the time my App component renders, we must show some fallback content while we’re waiting for it to load. This can be a loading indicator, brought in action by the suspense component. Below is the syntax for adding suspense component to react.lazy:
+
+```
+import React, { lazy, Suspense } from ‘react’;
+import ReactDOM from ‘react-dom’;
+import ‘./index.css’;
+// import Artists from ‘./Artists’;
+const Artists = lazy(() => import(‘./Artists’))
+class App extends React.Component {
+ render(){
+  return(
+   <div className=”App”>
+    <Suspense fallback={<h1>Still Loading…</h1>}>
+     <Artists />
+    </Suspense>
+   </div>
+  );
+ }
+}
+ReactDOM.render(<App />, document.getElementById(‘root’));
+```
+ 
+On your localhost it should be really fast and you might not be able to spot the changes. You can however create a timer helper or just simulate a slower network that would be able to show you exactly how the changes occur in milliseconds. This can be done by:
+
+- opening the dev tools on your browser
+- choosing the network tab
+- clicking on the online tab at the far right to reveal other options (presets)
+- choosing fast 3G
+
+
+
+# Memory Leak
+
+- Memory leaks can occur in React when components and their associated resources, such as event listeners and state, are not properly cleaned up when they are no longer needed. This can result in the accumulation of unused resources in memory over time, which can eventually lead to performance issues and crashes.
+
+- Example of Memory Leak
+```
+import React, { useState } from 'react';
+
+function ComponentWithLeak() {
+  const [count, setCount] = useState(0);
+
+  const handleClick = () => {
+    setCount(count + 1);
+  };
+
+  // Add an event listener when the component mounts
+  window.addEventListener('click', handleClick);
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+    </div>
+  );
+}
+
+function App() {
+  const [showComponent, setShowComponent] = useState(true);
+
+  const handleToggle = () => {
+    setShowComponent(!showComponent);
+  };
+
+  return (
+    <div>
+      <button onClick={handleToggle}>Toggle Component</button>
+      {showComponent && <ComponentWithLeak />}
+    </div>
+  );
+}
+
+export default App;
+```
+- To fix this memory leak, we need to remove the event listener when the component unmounts. We can do this by using the useEffect() hook with a cleanup function:
+### Example
+
+```
+import React, { useState, useEffect } from 'react';
+
+function ComponentWithoutLeak() {
+  const [count, setCount] = useState(0);
+
+  const handleClick = () => {
+    setCount(count + 1);
+  };
+
+  useEffect(() => {
+    // Add an event listener when the component mounts
+    window.addEventListener('click', handleClick);
+
+    // Remove the event listener when the component unmounts
+    return () => {
+      window.removeEventListener('click', handleClick);
+    };
+  }, []);
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+    </div>
+  );
+}
+
+function App() {
+  const [showComponent, setShowComponent] = useState(true);
+
+  const handleToggle = () => {
+    setShowComponent(!showComponent);
+  };
+
+  return (
+    <div>
+      <button onClick={handleToggle}>Toggle Component</button>
+      {showComponent && <ComponentWithoutLeak />}
+    </div>
+  );
+}
+
+export default App;
+```
+
+-  To avoid memory leaks in React, it's important to properly clean up any resources associated with components when they are no longer needed, such as event listeners, timers, and state. This can be done using the useEffect() hook with a cleanup function, or by using other techniques such as componentWillUnmount for class components.
+
+## Error Boundaries
+
+- Error boundaries are React components that catch and handle errors that occur during the rendering process of their children. This helps to prevent the entire application from crashing and provides a way to gracefully handle errors and display error messages to the user.
+
+### Class Component
+
+```
+import React, { Component } from 'react';
+
+class ErrorBoundary extends Component {
+  state = {
+    hasError: false,
+    errorMessage: ''
+  };
+
+  componentDidCatch = (error, info) => {
+    this.setState({ hasError: true, errorMessage: error.message });
+  };
+
+  render() {
+    if (this.state.hasError) {
+      return <h1>{this.state.errorMessage}</h1>;
+    }
+    return this.props.children;
+  }
+}
+
+export default ErrorBoundary;
+
+```
+- In this example, the ErrorBoundary component is defined as a class component that has a state object to keep track of whether an error has occurred and the error message. It also has a `componentDidCatch()` method that catches any errors that occur in its children and updates the component's state accordingly.
+
+
+### Functional Component
+```
+import React from 'react';
+import ErrorBoundary from './ErrorBoundary';
+
+function MyComponent() {
+  return <h1>{undefinedVariable}</h1>;
+}
+
+function App() {
+  return (
+    <ErrorBoundary>
+      <MyComponent />
+    </ErrorBoundary>
+  );
+}
+
+export default App;
+```
+
+- Error boundaries provide a useful way to handle errors in React and prevent the entire application from crashing. They can be used to catch and handle errors for specific components, allowing the rest of the application to continue functioning normally.
+
+# --------------- Day-8 ----------------------
+
+## State Management
+The Four Kinds of React State to Manage :
+When we talk about state in our applications, it’s important to be clear about what types of state actually matter.
+
+#### There are four main types of state you need to properly manage in your React apps:
+
+- Local state
+- Global state
+- Server state
+- URL state
+### Local (UI) state –
+- Local state is data we manage in one or another component.
+- Local state is most often managed in React using the useState hook.
+- For example, local state would be needed to show or hide a modal component or to track values for a form component, such as form submission, when the form is disabled and the values of a form’s inputs.
+
+### Global (UI) state –
+- Global state is data we manage across multiple components.
+- Global state is necessary when we want to get and update data anywhere in our app, or in multiple components at least.
+- A common example of global state is authenticated user state. If a user is logged into our app, it is necessary to get and change their data throughout our application.
+- Sometimes state we think should be local might become global.
+
+### Server state –
+- Data that comes from an external server that must be integrated with our UI state.
+- Server state is a simple concept, but can be hard to manage alongside all of our local and global UI state.
+- There are several pieces of state that must be managed every time you fetch or update data from an external server, including loading and error state.
+- Fortunately there are tools such as SWR and React Query that make managing server state much easier.
+
+### URL state –
+- Data that exists on our URLs, including the pathname and query parameters.
+
+- URL state is often missing as a category of state, but it is an important one.
+
+- In many cases, a lot of major parts of our application rely upon accessing URL state. Try to imagine building a blog without being able to fetch a post based off of its slug or id that is located in the URL!
+
+## REDUX AND REDUX TOOLKIT
+
+- Redux is a popular state management library for JavaScript applications, particularly those built with React. It provides a predictable and centralized way to manage application state and allows for easy debugging and time-travel debugging.
+- Example of Redux
+
+```
+import { createStore } from 'redux';
+
+// Define an initial state for the application
+const initialState = {
+  count: 0
+};
+
+// Define a reducer function to handle state updates
+function counterReducer(state = initialState, action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return { count: state.count + 1 };
+    case 'DECREMENT':
+      return { count: state.count - 1 };
+    default:
+      return state;
+  }
+}
+
+// Create a store for the application using the reducer function
+const store = createStore(counterReducer);
+
+// Dispatch an action to update the state
+store.dispatch({ type: 'INCREMENT' });
+
+```
+
+- Redux Toolkit is a set of utilities and best practices that aim to simplify the process of setting up and using Redux. It provides a standardized way to define reducers, actions, and the store, as well as built-in support for asynchronous requests and immutability.
+
+- Some people criticize Redux and its best practices as it adds a large amount of code that is sometimes considered unnecessary. Undoubtedly, it is considered the best product, especially for complex applications. Therefore, developers came up with the development of the Redux Toolkit (RTK), which has dramatically improved the efficiency of Redux development. 
+
+RTK eliminates the complexity and issues of the developers related to boilerplate and the addition of unwanted code. Simply said, it solves the following three major problems that developers had with Redux.  
+
+- It made it easier to configure Redux on any system.  
+- You will not require many libraries to get started with Redux and handle complex applications. 
+- With RTK, Redux can work with enough boilerplate code.  
+
+### How to Use Redux Toolkit in your project? 
+
+Step 1: How to install the redux toolkit
+```
+npm install @reduxjs/toolkit react-redux
+
+```
+
+Step 2: Creating and initializing the store to hold the state
+
+-To create a store for storing the states, we will create a store.js file under the src folder, where you can add the following code. 
+
+```
+import { configureStore } from '@reduxjs/toolkit' 
+export default configureStore({ 
+reducer: {} //add reducers here 
+}) 
+```
+
+Step 3: Provide a store in React app
+
+```
+import store from './store' 
+import { Provider } from 'react-redux' 
+ReactDOM.render( 
+<Provider store={store}> 
+<App /> 
+</Provider>, 
+document.getElementById('root') 
+)  
+```
+
+Step 4: Write Reducers and Actions
+
+- It's time to write some reducer and action functions for the above-created Redux store. Earlier, reducers and actions are written separately.  
+
+Actions
+
+```
+// actions/index.js 
+export const Increase = () => ({ 
+type: 'INCREASE' 
+}) 
+export const Decrease = () => ({ 
+type: 'DECREASE' 
+}) 
+```
+
+Reducers
+
+```
+// reducers/index.js 
+export default (state = 0, action) => { 
+switch (action.type) { 
+case 'INCREASE': 
+return state + 1 
+case 'DECREASE': 
+return state - 1 
+default: 
+return state 
+} 
+} 
+```
+- But with the Redux toolkit, you can create concise code using createSclice function. In the below counterSlice.js file, we are writing both the reducers and actions. 
+
+```
+import { createSlice } from '@reduxjs/toolkit' //next js redux toolkit  
+export const counterSlice = createSlice({ 
+name: 'counter', 
+initialState: { 
+value: 0 
+}, 
+reducers: { 
+increase: state => { 
+state.value += 1 
+}, 
+decrease: state => { 
+state.value -= 1 
+} 
+} 
+}) 
+// case under reducers becomes an action 
+export const { increase, decrease } = counterSlice.actions 
+export default counterSlice.reducer
+```
+
+- Combining reducers and actions will eliminate the need to switch among statements so you can efficiently manage the action with its corresponding reducer.  
+
+Step 5: Importing reducer
+
+- Now, we will import the reducer into the store.js file to perform the actions on the states. Below is the code. 
+
+```
+import { configureStore } from '@reduxjs/toolkit' //create react app redux toolkit  
+import counterReducer from '.counterSlice' //import our reducer from step 4 
+export default configureStore({ 
+reducer: { 
+counter: counterReducer //add our reducer from step 4 
+} 
+}) 
+
+```
+Step 6: Adding the dispatch function in the UI
+
+```
+import { useSelector, useDispatch } from 'react-redux' 
+import { decrease, increase } from './counterSlice'
+
+export function Counter() { 
+const count = useSelector(state => state.counter.value) 
+// name property as 'counter.' 
+// initialState with a 'value' property 
+// useSelector to return the state.counter.value 
+const dispatch = useDispatch() 
+// dispatch function to dispatch our actions 
+return ( 
+<div> 
+<button onClick={() => dispatch(increase())}> 
+Increase 
+</button> 
+<p>{count}<p> 
+<button onClick={() => dispatch(decrease())}> 
+Decrease 
+</button> 
+</div> 
+) 
+} 
+```
+- The Redux store at app/store.js will be the central station for the Redux Toolkit application. 
+
+- configureStore accepts a single configuration object with multiple parameters. The components can access the stored data after the Provider component from react-redux wraps the entire application. 
+
+```
+// store.js 
+import { configureStore } from '@reduxjs/toolkit' 
+import counterReducer from '../features/counter/counterSlice' 
+ 
+export const store = configureStore({ 
+  reducer: { 
+    counter: counterReducer, 
+  }, 
+  }) 
+```
+
+```
+// index.js 
+import React from 'react'; 
+import ReactDOM from 'react-dom'; 
+import './index.css'; 
+import App from './App'; 
+import { store } from './app/store'; 
+import { Provider } from 'react-redux'; 
+ReactDOM.render( 
+<React.StrictMode> 
+<Provider store={store}> 
+<App /> 
+</Provider> 
+</React.StrictMode>, 
+document.getElementById('root') 
+); 
+```
+- It is easy to set up a Redux and create a Redux application. With Redux, managing different states of complex applications has become more accessible. This article will highlight how to work around Redux along with simple terminologies. 
+
+## Difference between Redux and Context API
+
+Both Context API and Redux are state management tools for React applications, but there are some key differences between them.
+
+Context API is a built-in feature of React that allows components to share data without having to pass it down through each level of the component tree via props. Context API is designed for managing small amounts of global state that is needed by multiple components, and is best used for simple cases where the state doesn't change frequently.
+
+Redux, on the other hand, is a third-party library that provides a more powerful and centralized way to manage state in a React application. Redux is designed for managing large amounts of complex state that is needed by multiple components, and is best used for more complex cases where the state is updated frequently.
+
+Some key differences between Context API and Redux include:
+
+- Complexity: Context API is simpler and easier to set up than Redux, but it's not as powerful or flexible. Redux requires more setup and configuration, but it provides a more powerful and centralized way to manage state.
+
+- Global vs local state: Context API is designed for managing global state that is needed by multiple components, while Redux is designed for managing both global and local state that is needed by multiple components.
+
+- Data flow: In Context API, data flows down through the component tree from the parent to the child components via context. In Redux, data flows in a unidirectional flow from the store to the components via actions and reducers.
+
+- Debugging: Redux provides powerful debugging tools like the Redux DevTools that make it easier to debug and track state changes, while Context API doesn't provide any built-in debugging tools.
+
+Overall, Context API and Redux both have their strengths and weaknesses, and the choice of which one to use depends on the specific needs and complexity of the application. For small and simple cases, Context API can be a good choice, while for larger and more complex cases, Redux may be a better option.
+
+### Redux Thunk and Saga
+
+- Both Redux Thunk and Redux Saga are middleware libraries for Redux that enable the use of asynchronous actions in Redux. However, they have some key differences in how they handle asynchronous actions.
+
+- Redux Thunk is a simple middleware library that allows for the creation of asynchronous actions in Redux. It works by allowing action creators to return functions instead of objects. These functions can then dispatch additional actions or perform async tasks before dispatching the final action.
+
+- Redux Saga, on the other hand, is a more complex middleware library that uses ES6 generators to manage async flow in Redux. It provides a more powerful and flexible way to handle asynchronous actions and enables features like cancellation and retry.
+
